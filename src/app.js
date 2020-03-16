@@ -1,36 +1,32 @@
-var AWS = require('aws-sdk');
-var fs = require('fs');
-var path = require('path');
-const chokidar = require('chokidar');
 const config = require('./config/index');
+const AWS = require('aws-sdk');
+const fs = require('fs');
+const path = require('path');
+const chokidar = require('chokidar');
 
 console.log('Starting Animl Base. Watching directory: ', config.imgDir);
 
 // Connect to AWS
 AWS.config.update({region: config.aws.region});
-const s3 = new AWS.S3({
-  apiVersion: '2006-03-01',
-  accessKeyId: config.aws.accessKeyId,
-  secretAccessKey: config.aws.secretAccessKey,
-});
+const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
 // Handle new images
-const handleNewFile = (filePath) => {
-  console.log('Uploading file: ', filePath);
+const uploadNewFile = (filePath) => {
+  console.log('Uploading file: ' + filePath + ' to ' + config.aws.bucket);
   
-  var uploadParams = {Bucket: config.aws.bucket, Key: '', Body: ''};
-  var fileStream = fs.createReadStream(filePath);
-  fileStream.on('error', function(err) {
+  let uploadParams = { Bucket: config.aws.bucket, Key: '', Body: '' };
+  let fileStream = fs.createReadStream(filePath);
+  fileStream.on('error', err => {
     console.log('File Error', err);
   });
   uploadParams.Body = fileStream;
   uploadParams.Key = path.basename(filePath);
 
-  s3.putObject(uploadParams, function (err, data) {
+  s3.putObject(uploadParams, (err, data) => {
     if (err) {
-      console.log("Error", err);
+      console.log('Error', err);
     } if (data) {
-      console.log("Upload Success", data.Location);
+      console.log('Upload Success', data);
     }
   });
 };
@@ -45,14 +41,13 @@ const watcher = chokidar.watch(config.imgDir, {
 // Add event listeners
 watcher
   .on('ready', () => console.log('Initial scan complete. Ready for changes'))
-  .on('add', filePath => handleNewFile(filePath))
+  .on('add', filePath => uploadNewFile(filePath))
   .on('error', error => console.log(`Watcher error: ${error}`));
 
 // Clean up & shut down
 const gracefulShutDown = function () {
-  console.log('\nshutting down Animl Base')
-  watcher.close().then(() => console.log('closed'));
+  console.log('\nShutting down Animl Base...')
+  watcher.close().then(() => console.log('Closed'));
 };
-
 process.on('SIGTERM', gracefulShutDown);
 process.on('SIGINT', gracefulShutDown)

@@ -18,12 +18,12 @@ Download the Rasberry Pi Imager for your OS
 the Rasbian image to the SD card
 
 2. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
-menu, and download some additional dependencies (node, vim, git):
+menu, and download some additional dependencies (node, vim, git, awscli):
 
 ```
 $ sudo apt update
 $ sudo apt full-upgrade -y
-```
+```s
 ```
 $ curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash
 $ sudo apt-get install -y nodejs
@@ -31,6 +31,7 @@ $ sudo apt-get install -y nodejs
 ```
 $ sudo apt-get install vim -y
 $ sudo apt-get install git
+$ sudo apt-get install awscli
 ```
 
 3. Create a directory to store the app, cd into it, clone the repo, and install
