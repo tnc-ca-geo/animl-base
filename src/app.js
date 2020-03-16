@@ -7,11 +7,18 @@ const chokidar = require('chokidar');
 console.log('Starting Animl Base. Watching directory: ', config.imgDir);
 
 // Connect to AWS
-AWS.config.update({region: config.aws.region});
-const s3 = new AWS.S3({apiVersion: '2006-03-01'});
+AWS.config.update({ region: config.aws.region });
+const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 // Handle new images
 const uploadNewFile = (filePath) => {
+
+  const ext = path.extname(filePath);
+  if (!config.supportedFileTypes.includes(ext)) {
+    console.log('Not a supported filetype');
+    return;
+  }
+  
   console.log('Uploading file: ' + filePath + ' to ' + config.aws.bucket);
   
   let uploadParams = { Bucket: config.aws.bucket, Key: '', Body: '' };
@@ -22,7 +29,7 @@ const uploadNewFile = (filePath) => {
   uploadParams.Body = fileStream;
   uploadParams.Key = path.basename(filePath);
 
-  s3.putObject(uploadParams, (err, data) => {
+  s3.upload(uploadParams, (err, data) => {
     if (err) {
       console.log('Error', err);
     } if (data) {
