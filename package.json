@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/tnc-ca-geo/animl-base#readme",
   "dependencies": {
+    "aws-sdk": "^2.639.0",
     "chokidar": "^3.3.1",
     "dotenv": "^8.2.0"
   }
