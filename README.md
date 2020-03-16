@@ -23,7 +23,7 @@ menu, and download some additional dependencies (node, vim, git, awscli):
 ```
 $ sudo apt update
 $ sudo apt full-upgrade -y
-```s
+```
 ```
 $ curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash
 $ sudo apt-get install -y nodejs
@@ -36,6 +36,7 @@ $ sudo apt-get install awscli
 
 3. Create a directory to store the app, cd into it, clone the repo, and install
 node dependencies:
+
 ```
 $ mkdir /home/pi/Documents/animl-base
 $ cd /home/pi/Documents/animl-base
