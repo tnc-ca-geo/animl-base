@@ -26,7 +26,7 @@ const handleNewFile = (filePath) => {
   uploadParams.Body = fileStream;
   uploadParams.Key = path.basename(filePath);
 
-  s3.upload (uploadParams, function (err, data) {
+  s3.putObject(uploadParams, function (err, data) {
     if (err) {
       console.log("Error", err);
     } if (data) {
