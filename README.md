@@ -48,7 +48,7 @@ $ cd animl-base
 $ npm install
 ```
 
-4. Add a .env file to the root directory with the following format: 
+4. Add a .env file to the project's root directory with the following items: 
 
 ```
 # AWS creds supplied to env by aws-vault
@@ -62,6 +62,35 @@ IMG_DIR = '/path/to/images/'
 AWS_REGION = us-west-1
 DEST_BUCKET = animl-images
 ```
+
+## Usage
+First, run any of the following to check if the app is already running in the 
+background:
+```
+$ pm2 list
+$ pm2 status
+$ pm2 show
+```
+If it's not listed, you can start the app temporarily:
+```
+$ npm start
+```
+Or start it up as a daemon (in the background):
+```
+$ npm run start-daemon
+```
+If you want to generate a script that will lunch PM2 on boot together with the 
+application, run: 
+```
+$ pm2 startup systemd
+```
+Then copy and run the generated command, and finally run:
+```
+$ pm2 save
+```
+This will save the current state of PM2 (with app.js running) in a dump file 
+that will be used when they system starts or when resurrecting PM2.
+
 
 
 
