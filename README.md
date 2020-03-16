@@ -39,7 +39,8 @@ node dependencies:
 $ mkdir /home/pi/Documents/animl-base
 $ cd /home/pi/Documents/animl-base
 $ git clone https://github.com/tnc-ca-geo/animl-base.git
-$ npm init
+$ cd animl-base
+$ npm install
 ```
 
 
