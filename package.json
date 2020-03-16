@@ -1,0 +1,22 @@
+{
+  "name": "animl-base",
+  "version": "0.0.1",
+  "description": "Node application deployed on Rasberry Pi wireless camera trap base station",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tnc-ca-geo/animl-base.git"
+  },
+  "author": "Nathaniel Rindlaub",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tnc-ca-geo/animl-base/issues"
+  },
+  "homepage": "https://github.com/tnc-ca-geo/animl-base#readme",
+  "dependencies": {
+    "chokidar": "^3.3.1"
+  }
+}
