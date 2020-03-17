@@ -51,7 +51,7 @@ $ npm install
 4. Add a .env file to the project's root directory with the following items: 
 
 ```
-# AWS creds supplied to env by aws-vault
+# AWS creds
 AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
 AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
 
