@@ -69,17 +69,17 @@ background:
 ```
 $ pm2 list
 $ pm2 status
-$ pm2 show
+$ pm2 show app
 ```
 If it's not listed, you can start the app temporarily:
 ```
 $ npm start
 ```
-Or start it up as a daemon (in the background):
+Or start it up as a daemon (app will run indefinitely in the background):
 ```
 $ npm run start-daemon
 ```
-If you want to generate a script that will lunch PM2 on boot together with the 
+If you want to generate a script that will launch PM2 on boot together with the 
 application, run: 
 ```
 $ pm2 startup systemd
