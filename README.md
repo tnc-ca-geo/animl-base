@@ -10,17 +10,17 @@ The current hardware includes:
 
 1. To set up the Pi, load Rasbian to the SD card:
 
-Format the SD card using a desktop computer with the SD card 
+    1. Format the SD card using a desktop computer with the SD card 
 [memory card formatter](https://www.sdcard.org/downloads/formatter/)
-
-Download the Rasberry Pi Imager for your OS 
+    2. Download the Rasberry Pi Imager for your OS 
 [here](https://www.raspberrypi.org/downloads/) and step through wizard to burn 
 the Rasbian image to the SD card
 
 2. Create new user (TODO)
 
 3. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
-menu, and download some additional dependencies (node, vim, git, awscli, pm2):
+menu, and download some additional global dependencies 
+(node, vim, git, awscli, pm2):
 
 ```
 $ sudo apt update
@@ -37,7 +37,7 @@ $ sudo apt-get install awscli
 $ sudo npm install -g pm2
 ```
 
-3. Create a directory to store the app, cd into it, clone the repo, and install
+4. Create a directory to store the app, cd into it, clone the repo, and install
 node dependencies:
 
 ```
@@ -48,7 +48,7 @@ $ cd animl-base
 $ npm install
 ```
 
-4. Add a .env file to the project's root directory with the following items: 
+5. Add a .env file to the project's root directory with the following items: 
 
 ```
 # AWS creds
