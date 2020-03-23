@@ -1,8 +1,9 @@
+const fs = require('fs');
 const config = require('./config/index');
 const AWS = require('aws-sdk');
-const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
+const utils = require('./utils/utils');
 
 console.log('Starting Animl Base. Watching directory: ', config.imgDir);
 
@@ -11,23 +12,22 @@ AWS.config.update({ region: config.aws.region });
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 // Handle new images
-const uploadNewFile = (filePath) => {
+async function uploadNewFile(filePath) {
 
   const ext = path.extname(filePath);
   if (!config.supportedFileTypes.includes(ext)) {
     console.log('Not a supported filetype');
     return;
   }
-  
+
   console.log('Uploading file: ' + filePath + ' to ' + config.aws.bucket);
-  
-  let uploadParams = { Bucket: config.aws.bucket, Key: '', Body: '' };
+
+  const hash = await utils.createHash(filePath, __dirname);
+  let uploadParams = { Bucket: config.aws.bucket };
   let fileStream = fs.createReadStream(filePath);
-  fileStream.on('error', err => {
-    console.log('File Error', err);
-  });
+  fileStream.on('error', err => console.log('File Error', err));
   uploadParams.Body = fileStream;
-  uploadParams.Key = path.basename(filePath);
+  uploadParams.Key = hash + ext;
 
   s3.upload(uploadParams, (err, data) => {
     if (err) {
@@ -36,6 +36,7 @@ const uploadNewFile = (filePath) => {
       console.log('Upload Success', data);
     }
   });
+  
 };
 
 // Initialize watcher
@@ -52,9 +53,5 @@ watcher
   .on('error', error => console.log(`Watcher error: ${error}`));
 
 // Clean up & shut down
-const gracefulShutDown = function () {
-  console.log('\nShutting down Animl Base...')
-  watcher.close().then(() => console.log('Closed'));
-};
-process.on('SIGTERM', gracefulShutDown);
-process.on('SIGINT', gracefulShutDown)
+process.on('SIGTERM', utils.gracefulShutDown);
+process.on('SIGINT', utils.gracefulShutDown)
