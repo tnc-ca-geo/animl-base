@@ -51,7 +51,7 @@ $ npm install
 4. Add a .env file to the project's root directory with the following items: 
 
 ```
-# AWS creds supplied to env by aws-vault
+# AWS creds
 AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
 AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
 
@@ -69,17 +69,17 @@ background:
 ```
 $ pm2 list
 $ pm2 status
-$ pm2 show
+$ pm2 show app
 ```
 If it's not listed, you can start the app temporarily:
 ```
 $ npm start
 ```
-Or start it up as a daemon (in the background):
+Or start it up as a daemon (app will run indefinitely in the background):
 ```
 $ npm run start-daemon
 ```
-If you want to generate a script that will lunch PM2 on boot together with the 
+If you want to generate a script that will launch PM2 on boot together with the 
 application, run: 
 ```
 $ pm2 startup systemd
