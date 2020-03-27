@@ -2,6 +2,12 @@
 Node application deployed on Rasberry Pi wireless camera trap base station to 
 push incoming images to s3. 
 
+## Related repos
+- Animl lambda function   http://github.com/tnc-ca-geo/animl-lambda
+- Animl ML resources      http://github.com/tnc-ca-geo/animl-ml
+- Animl desktop app       https://github.com/tnc-ca-geo/animl-desktop
+- Animl cloud platform    https://github.com/tnc-ca-geo/animl
+
 ## Rasberry Pi setup
 The current hardware includes: 
 - Raspberry Pi 4b (4GB)
