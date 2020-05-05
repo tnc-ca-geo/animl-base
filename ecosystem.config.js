@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
     name: 'Animl Base',
-    script: './app.js',
+    script: './src/app.js',
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
     // args: 'one two',
     instances: 1,
