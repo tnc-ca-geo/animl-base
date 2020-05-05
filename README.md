@@ -15,10 +15,26 @@ The current hardware includes:
     2. Download the Rasberry Pi Imager for your OS 
 [here](https://www.raspberrypi.org/downloads/) and step through wizard to burn 
 the Rasbian image to the SD card
+    3. Eject the SD card from your desktop computer, inster into Pi, and plug 
+    in the Pi to turn it on
+    4. Change the password of the default pi user by opening the terminal, 
+    enter `passwd` on the command line and press Enter. You'll be prompted to 
+    enter your current password to authenticate (if you haven't set it yet the 
+    default pw is `raspberry`), and then asked for a new password.
 
-2. Create new user (TODO)
+2. Create new user called "animl", give it the same permissions as pi user, 
+and switch user:
+```
+$ sudo adduser animl
+$ usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,netdev,input animl
+$ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopasswd
+$ su - animl
+```
 
-3. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
+3. TODO: format and mount hard drive
+
+## Install Animl Base and dependencies
+1. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
 menu, and download some additional global dependencies 
 (node, vim, git, awscli, pm2):
 
@@ -37,18 +53,18 @@ $ sudo apt-get install awscli
 $ sudo npm install -g pm2
 ```
 
-4. Create a directory to store the app, cd into it, clone the repo, and install
+2. Create a directory to store the app, cd into it, clone the repo, and install
 node dependencies:
 
 ```
-$ mkdir /home/pi/Documents/animl-base
-$ cd /home/pi/Documents/animl-base
+$ mkdir /home/animl/animl-base
+$ cd /home/animl/animl-base
 $ git clone https://github.com/tnc-ca-geo/animl-base.git
 $ cd animl-base
 $ npm install
 ```
 
-5. Add a .env file to the project's root directory with the following items: 
+3. Add a .env file to the project's root directory with the following items: 
 
 ```
 # AWS creds
@@ -62,6 +78,22 @@ IMG_DIR = '/path/to/images/'
 AWS_REGION = us-west-1
 DEST_BUCKET = animl-images
 ```
+
+## Set up Buckeye server software (Multibase Server Edition)
+1. Download the Mbase [tarball](https://www.buckeyecam.com/getfile.php?file=mbse-latest-armv7hl.tbz)
+and unzip using 
+```
+tar xcf /path/to/FILENAME.tbz
+```
+
+2. Move the `mbase` directory to `/usr/local`
+
+3. Follow the installation instructions in `mbase/README.TXT' to complete the 
+installation
+
+
+
+
 
 ## Usage
 First, run any of the following to check if the app is already running in the 
