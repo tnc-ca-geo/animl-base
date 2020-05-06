@@ -1,6 +1,6 @@
 # Animl Base
-Node application deployed on Rasberry Pi wireless camera trap base station to 
-push incoming images to s3. 
+Animl Base is a node application deployed on Rasberry Pi that ingests new images 
+from a Buckeye wireless camera trap base station and uploads them to S3.
 
 ## Related repos
 - Animl lambda function   http://github.com/tnc-ca-geo/animl-lambda
@@ -14,6 +14,7 @@ The current hardware includes:
 - SD card (64GB)
 - SSD external drive (250GB)
 
+### Set up hardware and OS
 1. To set up the Pi, load Rasbian to the SD card:
 
     1. Format the SD card using a desktop computer with the SD card 
@@ -37,9 +38,40 @@ $ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopas
 $ su - animl
 ```
 
-3. TODO: format and mount hard drive
+3. Format and mount hard drive
+    1. Plug in the hard drive and format it to ext4 (instructions can be found 
+    [here](https://raspberrytips.com/format-mount-usb-drive/))
+    2. Create the mount point and make the animl user the owner of it (decent 
+    instructions on this [here](https://www.htpcguides.com/properly-mount-usb-storage-raspberry-pi/))
+    ```
+    $ sudo mkdir /media/animl-drive
+    $ sudo chown -R animl:animl /media/animl-drive
+    $ sudo chmod -R 775 /media/animl-drive
+    ```
+    3. Find the uuid of the drive by running the following command and looking 
+    for entries at `/dev/sda1`. Copy the uuid as we'll need it in the next step.
+    ```
+    sudo blkid
+    ```
+    4. Amend the `/etc/fstab` file so that the Pi automatically mounts the 
+    drive on boot.
+    ```
+    $ sudo vim /etc/fstab
+    ```
+    Add the following line to the bottom of the file:
+    ```
+    UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
+    ```
+    5. Once the fstab file is saved, mount all drives by running
+    ```
+    $ sudo mount -a
+    ```
+    6. Finally, create a `/media/animl-drive/data` directory
+    ```
+    $ mkdir /media/animl-drive/data
+    ```
 
-## Install Animl Base and dependencies
+### Install Animl Base and dependencies
 1. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
 menu, and download some additional global dependencies 
 (node, vim, git, awscli, pm2):
@@ -85,39 +117,68 @@ AWS_REGION = us-west-1
 DEST_BUCKET = animl-images
 ```
 
-## Set up Buckeye server software (Multibase Server Edition)
+### Set up Buckeye server software (Multibase Server Edition)
 1. Download the Mbase [tarball](https://www.buckeyecam.com/getfile.php?file=mbse-latest-armv7hl.tbz)
 and unzip using 
 ```
-tar xcf /path/to/FILENAME.tbz
+$ sudo tar -xjf /path/to/FILENAME.tbz
 ```
 
 2. Move the `mbase` directory to `/usr/local`
 
 3. Follow the installation instructions in `mbase/README.TXT' to complete the 
-installation
+installation. In step 3 of the instructions, when you are asked to edit and copy 
+the contents of `mbase/becmbse-sample.conf` to `etc/becmbse.conf`, use the 
+following settings (you can copy/paste the entire thing): 
 
-
-
-
-
-## Usage
-First, run any of the following to check if the app is already running in the 
-background:
 ```
-$ pm2 list
-$ pm2 status
-$ pm2 show app
+#This is where the writeable items (config and pictures) are stored.
+#It cannot be the same as the program installation directory.
+#This directory must be writeable by the user that the daemon
+#will run as.
+DATADIR=/media/animl-drive/data
+
+#Use and group.  May be name or number. Should not be root (0).
+#The user may also need permission to access USB devices.
+USER=animl
+GROUP=animl
+
+#TCP port for base manager HTTP
+PORT=8888
+
+#Enable (y) or disable (n) usb server
+USBSERV="y"
+
+#Options for SSL configuration.  Set this to use HTTPS instead of
+#unencrypted HTTP.  The CACERT line is usually optional.
+#CACERT=/path/to/cacert.crt
+#PEMFILE=/path/to/ssl.pem
+
+#Default parameters (run as a daemon in the background).  Try "mbased -?"
+#to see available options.
+DEFAULTPARAMS=-B 
 ```
-If it's not listed, you can start the app temporarily:
+
+4. Add `usr/local/mbase` to the "animl" user's PATH via `~/.profile`:
 ```
-$ npm start
+$ vim ~/.proffile
 ```
-Or start it up as a daemon (app will run indefinitely in the background):
+Copy the following line to the bottom of the file and save:
+```
+PATH="/usr/local/mbse:$PATH"
+```
+
+### Start Multibase Server and Animl Base as daemons
+We use [PM2](https://pm2.keymetrics.io/docs) to manage the application 
+processes. To start both the Buckeye Multibase Server and Animl Base up as 
+daemons that will run in the background and automatically launch on restart, 
+run:
+
 ```
 $ npm run start-daemon
 ```
-If you want to generate a script that will launch PM2 on boot together with the 
+
+Next, to generate a script that will launch PM2 on boot together with the 
 application, run: 
 ```
 $ pm2 startup systemd
@@ -126,12 +187,42 @@ Then copy and run the generated command, and finally run:
 ```
 $ pm2 save
 ```
-This will save the current state of PM2 (with app.js running) in a dump file 
-that will be used when they system starts or when resurrecting PM2.
+This will save the current state of PM2 (with Animl Base and Mulitbase 
+running) in a dump file that will be used when they system starts or when 
+resurrecting PM2.
 
 
 
+### Local webapp for managing Buckeye cams
+Multibase Server edition serves a locally-accessible web application for 
+managing the deployed devices, which can be found at `localhost:8888` when 
+Mulibase is running.
 
+
+## Managment
+TODO: provide guidance for SSH-ing into the Pi and other remote 
+managment related tasks
+
+### Check the status of the apps
+Run any of the following to check if the apps are already running in the 
+background via pm2:
+```
+$ pm2 list
+$ pm2 status
+$ pm2 show app
+```
+
+### TODO: Pulling down Animl Base updates from github and restarting remotely
+
+### Local webapp for managing Buckeye cams
+Multibase Server edition serves a locally-accessible web application for 
+managing the deployed devices, which can be found at `localhost:8888` when 
+Mulibase is running.
+
+TODO: figure out where to store shared creds for the webap and add instructions 
+here
+
+### TODO: Accessing logs
 
 
 

@@ -1,6 +1,6 @@
 module.exports = {
   apps : [{
-    name: 'Animl Base',
+    name: 'animl-base',
     script: './src/app.js',
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
     // args: 'one two',
@@ -17,7 +17,7 @@ module.exports = {
     }
   },
   {
-    name: 'Multibase Server Edition',
+    name: 'multibase-server-edition',
     script: 'mbasectl -s',
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
     // args: 'one two',
