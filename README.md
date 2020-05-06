@@ -15,21 +15,23 @@ The current hardware includes:
 - SSD external drive (250GB)
 
 ### Set up hardware and OS
-1. To set up the Pi, load Rasbian to the SD card:
 
-    1. Format the SD card using a desktop computer with the SD card 
+#### Step 1 - load Rasbian to the SD card:
+
+1. Format the SD card using a desktop computer with the SD card 
 [memory card formatter](https://www.sdcard.org/downloads/formatter/)
-    2. Download the Rasberry Pi Imager for your OS 
+
+2. Download the Rasberry Pi Imager for your OS 
 [here](https://www.raspberrypi.org/downloads/) and step through wizard to burn 
 the Rasbian image to the SD card
-    3. Eject the SD card from your desktop computer, inster into Pi, and plug 
-    in the Pi to turn it on
-    4. Change the password of the default pi user by opening the terminal, 
-    enter `passwd` on the command line and press Enter. You'll be prompted to 
-    enter your current password to authenticate (if you haven't set it yet the 
-    default pw is `raspberry`), and then asked for a new password.
+3. Eject the SD card from your desktop computer, insert into Pi, and plug 
+in the Pi to turn it on
+4. Change the password of the default pi user by opening the terminal, 
+enter `passwd` on the command line and press Enter. You'll be prompted to 
+enter your current password to authenticate (if you haven't set it yet the 
+default pw is `raspberry`), and then asked for a new password.
 
-2. Create new user called "animl", give it the same permissions as pi user, 
+#### Step 2 - Create new user called "animl", give it the same permissions as pi user, 
 and switch user:
 ```
 $ sudo adduser animl
@@ -38,38 +40,38 @@ $ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopas
 $ su - animl
 ```
 
-3. Format and mount hard drive
-    1. Plug in the hard drive and format it to ext4 (instructions can be found 
-    [here](https://raspberrytips.com/format-mount-usb-drive/))
-    2. Create the mount point and make the animl user the owner of it (decent 
-    instructions on this [here](https://www.htpcguides.com/properly-mount-usb-storage-raspberry-pi/))
-    ```
-    $ sudo mkdir /media/animl-drive
-    $ sudo chown -R animl:animl /media/animl-drive
-    $ sudo chmod -R 775 /media/animl-drive
-    ```
-    3. Find the uuid of the drive by running the following command and looking 
-    for entries at `/dev/sda1`. Copy the uuid as we'll need it in the next step.
-    ```
-    sudo blkid
-    ```
-    4. Amend the `/etc/fstab` file so that the Pi automatically mounts the 
-    drive on boot.
-    ```
-    $ sudo vim /etc/fstab
-    ```
-    Add the following line to the bottom of the file:
-    ```
-    UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
-    ```
-    5. Once the fstab file is saved, mount all drives by running
-    ```
-    $ sudo mount -a
-    ```
-    6. Finally, create a `/media/animl-drive/data` directory
-    ```
-    $ mkdir /media/animl-drive/data
-    ```
+#### Step 3 - Format and mount hard drive
+1. Plug in the hard drive and format it to ext4 (instructions can be found 
+[here](https://raspberrytips.com/format-mount-usb-drive/))
+2. Create the mount point and make the animl user the owner of it (decent 
+instructions on this [here](https://www.htpcguides.com/properly-mount-usb-storage-raspberry-pi/))
+```
+$ sudo mkdir /media/animl-drive
+$ sudo chown -R animl:animl /media/animl-drive
+$ sudo chmod -R 775 /media/animl-drive
+```
+3. Find the uuid of the drive by running the following command and looking 
+for entries at `/dev/sda1`. Copy the uuid as we'll need it in the next step.
+```
+sudo blkid
+```
+4. Amend the `/etc/fstab` file so that the Pi automatically mounts the 
+drive on boot.
+```
+$ sudo vim /etc/fstab
+```
+Add the following line to the bottom of the file:
+```
+UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
+```
+5. Once the fstab file is saved, mount all drives by running
+```
+$ sudo mount -a
+```
+6. Finally, create a `/media/animl-drive/data` directory
+```
+$ mkdir /media/animl-drive/data
+```
 
 ### Install Animl Base and dependencies
 1. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
