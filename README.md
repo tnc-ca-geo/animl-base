@@ -37,7 +37,7 @@ directories, and processes going forward. Create it, give it the same
 permissions as the pi user, and switch user:
 ```
 $ sudo adduser animl
-$ usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,netdev,input animl
+$ sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,netdev,input animl
 $ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopasswd
 $ su - animl
 ```
