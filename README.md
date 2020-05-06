@@ -14,63 +14,32 @@ The current hardware includes:
 - SD card (64GB)
 - SSD external drive (250GB)
 
-### Set up hardware and OS
+### Set up Pi
 
 #### Step 1 - load Rasbian to the SD card:
 
 1. Format the SD card using a desktop computer with the SD card 
 [memory card formatter](https://www.sdcard.org/downloads/formatter/)
-
 2. Download the Rasberry Pi Imager for your OS 
 [here](https://www.raspberrypi.org/downloads/) and step through wizard to burn 
 the Rasbian image to the SD card
-3. Eject the SD card from your desktop computer, insert into Pi, and plug 
-in the Pi to turn it on
-4. Change the password of the default pi user by opening the terminal, 
-enter `passwd` on the command line and press Enter. You'll be prompted to 
+3. Eject the SD card from your desktop computer, insert into Pi, plug 
+in the Pi to turn it on, and step through the setup wizard
+4. If you weren't prompted to change the pi user password in the setup 
+wizard, change the password by opening the terminal, enter `passwd` on the 
+command line and press Enter. You'll be prompted to 
 enter your current password to authenticate (if you haven't set it yet the 
 default pw is `raspberry`), and then asked for a new password.
 
-#### Step 2 - Create new user called "animl", give it the same permissions as pi user, 
-and switch user:
+#### Step 2 - Create new user called "animl"
+The "animl" user will be the primary owner/user of all application files, 
+directories, and processes going forward. Create it, give it the same 
+permissions as the pi user, and switch user:
 ```
 $ sudo adduser animl
 $ usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,netdev,input animl
 $ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopasswd
 $ su - animl
-```
-
-#### Step 3 - Format and mount hard drive
-1. Plug in the hard drive and format it to ext4 (instructions can be found 
-[here](https://raspberrytips.com/format-mount-usb-drive/))
-2. Create the mount point and make the animl user the owner of it (decent 
-instructions on this [here](https://www.htpcguides.com/properly-mount-usb-storage-raspberry-pi/))
-```
-$ sudo mkdir /media/animl-drive
-$ sudo chown -R animl:animl /media/animl-drive
-$ sudo chmod -R 775 /media/animl-drive
-```
-3. Find the uuid of the drive by running the following command and looking 
-for entries at `/dev/sda1`. Copy the uuid as we'll need it in the next step.
-```
-sudo blkid
-```
-4. Amend the `/etc/fstab` file so that the Pi automatically mounts the 
-drive on boot.
-```
-$ sudo vim /etc/fstab
-```
-Add the following line to the bottom of the file:
-```
-UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
-```
-5. Once the fstab file is saved, mount all drives by running
-```
-$ sudo mount -a
-```
-6. Finally, create a `/media/animl-drive/data` directory
-```
-$ mkdir /media/animl-drive/data
 ```
 
 ### Install Animl Base and dependencies
@@ -112,11 +81,44 @@ AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
 AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
 
 # Directory to watch
-IMG_DIR = '/path/to/images/'
+IMG_DIR = '/media/animl-drive/data/'
 
 # S3 
 AWS_REGION = us-west-1
 DEST_BUCKET = animl-images
+```
+
+### Format and mount SSD drive
+1. Plug in the hard drive and format it to ext4 (instructions can be found 
+[here](https://raspberrytips.com/format-mount-usb-drive/))
+2. Create the mount point and make the animl user the owner of it (decent 
+instructions on this [here](https://www.htpcguides.com/properly-mount-usb-storage-raspberry-pi/))
+```
+$ sudo mkdir /media/animl-drive
+$ sudo chown -R animl:animl /media/animl-drive
+$ sudo chmod -R 775 /media/animl-drive
+```
+3. Find the uuid of the drive by running the following command and looking 
+for entries at `/dev/sda1`. Copy the uuid as we'll need it in the next step.
+```
+sudo blkid
+```
+4. Amend the `/etc/fstab` file so that the Pi automatically mounts the 
+drive on boot.
+```
+$ sudo vim /etc/fstab
+```
+Add the following line to the bottom of the file:
+```
+UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
+```
+5. Once the fstab file is saved, mount all drives by running
+```
+$ sudo mount -a
+```
+6. Finally, create a `/media/animl-drive/data` directory
+```
+$ mkdir /media/animl-drive/data
 ```
 
 ### Set up Buckeye server software (Multibase Server Edition)
@@ -192,8 +194,6 @@ $ pm2 save
 This will save the current state of PM2 (with Animl Base and Mulitbase 
 running) in a dump file that will be used when they system starts or when 
 resurrecting PM2.
-
-
 
 ### Local webapp for managing Buckeye cams
 Multibase Server edition serves a locally-accessible web application for 
