@@ -14,62 +14,33 @@ The current hardware includes:
 - SD card (64GB)
 - SSD external drive (250GB)
 
-### Set up hardware and OS
-1. To set up the Pi, load Rasbian to the SD card:
+### Set up Pi
 
-    1. Format the SD card using a desktop computer with the SD card 
+#### Step 1 - load Rasbian to the SD card:
+
+1. Format the SD card using a desktop computer with the SD card 
 [memory card formatter](https://www.sdcard.org/downloads/formatter/)
-    2. Download the Rasberry Pi Imager for your OS 
+2. Download the Rasberry Pi Imager for your OS 
 [here](https://www.raspberrypi.org/downloads/) and step through wizard to burn 
 the Rasbian image to the SD card
-    3. Eject the SD card from your desktop computer, inster into Pi, and plug 
-    in the Pi to turn it on
-    4. Change the password of the default pi user by opening the terminal, 
-    enter `passwd` on the command line and press Enter. You'll be prompted to 
-    enter your current password to authenticate (if you haven't set it yet the 
-    default pw is `raspberry`), and then asked for a new password.
+3. Eject the SD card from your desktop computer, insert into Pi, plug 
+in the Pi to turn it on, and step through the setup wizard
+4. If you weren't prompted to change the pi user password in the setup 
+wizard, change the password by opening the terminal, enter `passwd` on the 
+command line and press Enter. You'll be prompted to 
+enter your current password to authenticate (if you haven't set it yet the 
+default pw is `raspberry`), and then asked for a new password.
 
-2. Create new user called "animl", give it the same permissions as pi user, 
-and switch user:
+#### Step 2 - Create new user called "animl"
+The "animl" user will be the primary owner/user of all application files, 
+directories, and processes going forward. Create it, give it the same 
+permissions as the pi user, and switch user:
 ```
 $ sudo adduser animl
-$ usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,netdev,input animl
+$ sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,netdev,input animl
 $ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopasswd
 $ su - animl
 ```
-
-3. Format and mount hard drive
-    1. Plug in the hard drive and format it to ext4 (instructions can be found 
-    [here](https://raspberrytips.com/format-mount-usb-drive/))
-    2. Create the mount point and make the animl user the owner of it (decent 
-    instructions on this [here](https://www.htpcguides.com/properly-mount-usb-storage-raspberry-pi/))
-    ```
-    $ sudo mkdir /media/animl-drive
-    $ sudo chown -R animl:animl /media/animl-drive
-    $ sudo chmod -R 775 /media/animl-drive
-    ```
-    3. Find the uuid of the drive by running the following command and looking 
-    for entries at `/dev/sda1`. Copy the uuid as we'll need it in the next step.
-    ```
-    sudo blkid
-    ```
-    4. Amend the `/etc/fstab` file so that the Pi automatically mounts the 
-    drive on boot.
-    ```
-    $ sudo vim /etc/fstab
-    ```
-    Add the following line to the bottom of the file:
-    ```
-    UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
-    ```
-    5. Once the fstab file is saved, mount all drives by running
-    ```
-    $ sudo mount -a
-    ```
-    6. Finally, create a `/media/animl-drive/data` directory
-    ```
-    $ mkdir /media/animl-drive/data
-    ```
 
 ### Install Animl Base and dependencies
 1. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
@@ -110,7 +81,7 @@ AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
 AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
 
 # Directory to watch
-IMG_DIR = '/path/to/images/'
+IMG_DIR = '/media/animl-drive/data/'
 
 # S3 
 AWS_REGION = us-west-1
@@ -165,6 +136,41 @@ It's also worth mapping the fixed IP address to the device's MAC address in
 your router configuration, so another devices can't take it when the Pi isn't 
 connected.
 
+### Format and mount SSD drive
+1. Plug in the hard drive and format it to ext4 (instructions can be found 
+[here](https://raspberrytips.com/format-mount-usb-drive/))
+2. Create the mount point and make the animl user the owner of it (decent 
+instructions on this [here](https://www.htpcguides.com/properly-mount-usb-storage-raspberry-pi/))
+```
+$ sudo mkdir /media/animl-drive
+$ sudo chown -R animl:animl /media/animl-drive
+$ sudo chmod -R 775 /media/animl-drive
+```
+3. Find the uuid of the drive by running the following command and looking 
+for entries at `/dev/sda1`. Copy the uuid as we'll need it in the next step.
+```
+sudo blkid
+```
+4. Amend the `/etc/fstab` file so that the Pi automatically mounts the 
+drive on boot.
+```
+$ sudo vim /etc/fstab
+```
+Add the following line to the bottom of the file:
+```
+UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
+```
+5. Once the fstab file is saved, mount all drives by running. NOTE: if the 
+drive is already mounted, unmount it first (`umount /dev/sda1` might 
+do the trick).
+```
+$ sudo mount -a
+```
+6. Finally, create a `/media/animl-drive/data` directory
+```
+$ mkdir /media/animl-drive/data
+```
+
 ### Set up Buckeye server software (Multibase Server Edition)
 1. Download the Mbase [tarball](https://www.buckeyecam.com/getfile.php?file=mbse-latest-armv7hl.tbz)
 and unzip using 
@@ -176,8 +182,17 @@ $ sudo tar -xjf /path/to/FILENAME.tbz
 
 3. Follow the installation instructions in `mbase/README.TXT' to complete the 
 installation. In step 3 of the instructions, when you are asked to edit and copy 
-the contents of `mbase/becmbse-sample.conf` to `etc/becmbse.conf`, use the 
-following settings (you can copy/paste the entire thing): 
+the contents of `mbase/becmbse-sample.conf` to `etc/becmbse.conf`. You 
+may run into permissions issues. The following commands will copy the file to 
+`/etc/`, rename it, and change the owner to "animl".
+```
+$ sudo cp /usr/local/mbse/becmbse-sample.conf /etc/
+$ sudo mv /etc/becmbse-sample.conf /etc/becmbse.conf
+$ sudo chown animl:animl /etc/becmbse.conf
+```
+
+At which point you can copy/paste the following settings into the config file 
+and save it: 
 
 ```
 #This is where the writeable items (config and pictures) are stored.
@@ -209,7 +224,7 @@ DEFAULTPARAMS=-B
 
 4. Add `usr/local/mbase` to the "animl" user's PATH via `~/.profile`:
 ```
-$ vim ~/.proffile
+$ vim ~/.profile
 ```
 Copy the following line to the bottom of the file and save:
 ```
@@ -217,10 +232,13 @@ PATH="/usr/local/mbse:$PATH"
 ```
 
 ### Start Multibase Server and Animl Base as daemons
+If you haven't plugged the Buckeye X-series PC Base to the Pi, you 
+can do that now. 
+
 We use [PM2](https://pm2.keymetrics.io/docs) to manage the application 
 processes. To start both the Buckeye Multibase Server and Animl Base up as 
 daemons that will run in the background and automatically launch on restart, 
-run:
+navigate to `~/animl-base/animl-base` and run:
 
 ```
 $ npm run start-daemon
@@ -239,12 +257,17 @@ This will save the current state of PM2 (with Animl Base and Mulitbase
 running) in a dump file that will be used when they system starts or when 
 resurrecting PM2.
 
-
-
 ### Local webapp for managing Buckeye cams
 Multibase Server edition serves a locally-accessible web application for 
 managing the deployed devices, which can be found at `localhost:8888` when 
 Mulibase is running.
+
+NOTEL: If you are having trouble adding a camera to the Base, from the 
+Base home user interface (the page you get to after loging in and 
+clicking the "admin" button under the base entry), 
+try "restoring the network" (hamburger menu -> Restore Network). 
+This will search for and locate any devices that were have 
+already been registered to the base.
 
 
 ## Managment
@@ -277,9 +300,9 @@ $ ssh animl@192.168.0.227
 Run any of the following to check if the apps are already running in the 
 background via pm2:
 ```
-$ pm2 list
+$ pm2 list all
 $ pm2 status
-$ pm2 show app
+$ pm2 show animl-base
 ```
 
 ### TODO: Pulling down Animl Base updates from github and restarting remotely
