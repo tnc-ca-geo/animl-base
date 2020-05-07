@@ -117,6 +117,54 @@ AWS_REGION = us-west-1
 DEST_BUCKET = animl-images
 ```
 
+### Update network settings
+#### Change the pi's hostname
+This step is not necessary but may be helpful to better distinguish the pi on 
+the network. To change the Pi's default hostname from "raspberrypi" to 
+"animl-base", first update the `/etc/hosts` file:
+```
+$ sudo vim /etc/hosts
+```
+replace "raspberrypi" with "animl-base" in the last line of the file and save. 
+Then open `/etc/hostname`:
+```
+$ sudo vim /etc/hostname
+```
+And replace "raspberrypi" with "animl-base".
+
+#### Double check that avahi-daemon is installed and running
+One of the easiest ways to connect remotely to you Pi and identify it on a 
+local network is with mDNS (good explainer on that 
+[here](https://www.howtogeek.com/167190/how-and-why-to-assign-the-.local-domain-to-your-raspberry-pi/)).
+If have Avahi installed and running on the Pi as described in that article, all 
+you need to do to SSH into your pi from within your local network is run 
+`ssh [USER]@[HOSTNAME].local. So in our case:
+```
+$ ssh animl@animl-base.local
+```
+This saves you from having to search for or remember the IP address of the Pi.
+
+Avahi This may have already been installed with the OS. To check, run:
+```
+$ avahi-daemon -V
+```
+If it returns a version number, you're all set, there's nothing more to do. If 
+not, all you have to do is install Avahi, and then your device will be 
+discoverable via  `[USER]@[HOSTNAME].local`:
+```
+$ sudo apt-get install avahi-daemon
+```
+
+#### Set up static IP address
+To make sure that the IP address doesn't change when it get's 
+disconnected/connected to the network (as is the case with DHCP IP assignments), 
+you can modify the Raspberry Pi’s DHCP client daemon 
+(instructions [here](https://pimylifeup.com/raspberry-pi-static-ip-address/)).
+
+It's also worth mapping the fixed IP address to the device's MAC address in 
+your router configuration, so another devices can't take it when the Pi isn't 
+connected.
+
 ### Set up Buckeye server software (Multibase Server Edition)
 1. Download the Mbase [tarball](https://www.buckeyecam.com/getfile.php?file=mbse-latest-armv7hl.tbz)
 and unzip using 
@@ -200,8 +248,30 @@ Mulibase is running.
 
 
 ## Managment
-TODO: provide guidance for SSH-ing into the Pi and other remote 
-managment related tasks
+
+### SSH into Pi
+To remotely login to the Pi via SSH, the Pi's SSH needs to be enabled from 
+the Raspberry Pi configuration menu (hopefully this was done at setup). You 
+then need to find the Pi's IP address on the network, which I've found is 
+simple if the Pi is connected to a screen and you can use the terminal. Just 
+run either of the following commands:
+```
+$ hostname -I
+```
+```
+$ ifconfig
+```
+
+However, if you don't have direct access to the Pi and are trying to scan a 
+network for it, `arp -a` or 
+[nmap](https://www.theurbanpenguin.com/find-my-raspberry-pi-using-nmap/) might 
+be helpful.
+
+Once you have the Pi's IP address, you can SSH into it with 
+`ssh [USER]@[IP ADDRESS]`, e.g.: 
+```
+$ ssh animl@192.168.0.227
+```
 
 ### Check the status of the apps
 Run any of the following to check if the apps are already running in the 
