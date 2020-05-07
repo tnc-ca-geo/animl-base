@@ -50,7 +50,7 @@ $ su - animl
 ### Install Animl Base and dependencies
 1. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
 menu, and download some additional global dependencies 
-(node, vim, git, awscli, pm2):
+(node, vim, git, awscli, pm2, nginx):
 
 ```
 $ sudo apt update
@@ -65,6 +65,7 @@ $ sudo apt-get install vim -y
 $ sudo apt-get install git
 $ sudo apt-get install awscli
 $ sudo npm install -g pm2
+$ sudo apt install nginx
 ```
 
 2. Create a directory to store the app, cd into it, clone the repo, and install
@@ -261,12 +262,71 @@ This will save the current state of PM2 (with Animl Base and Mulitbase
 running) in a dump file that will be used when they system starts or when 
 resurrecting PM2.
 
+_NOTE: PM2 can start the Multibase Server because we can set it to execute the 
+`mbasectl -s` startup command via the PM2 ecosystem config file, but it can not 
+stop or otherwise control it because it's not a node app. Instead, you can use 
+the following commands to manage the Multibase Server:_
+```
+# Get status of multibase server:
+$ mbasectl -i
+
+# Stop the server:
+$ mbasectl -k
+
+# Start the server:
+$ mbasectl -s
+```
+
 ### Local webapp for managing Buckeye cams
 Multibase Server edition serves a locally-accessible web application for 
-managing the deployed devices, which can be found at `localhost:8888` when 
-Mulibase is running.
+managing the deployed devices, which can be found at `localhost:8888` from 
+within the Pi when Mulibase is running.
 
-NOTEL: If you are having trouble adding a camera to the Base, from the 
+To access the webapp remotely, we can 
+[use Nginx as a reverse proxy server](https://dev.to/bogdaaamn/run-your-nodejs-application-on-a-headless-raspberry-pi-4jnn) 
+to redirect all external traffic from the Pi's port 80 to the Mulitbase Server 
+web app running on port 8888. To do so, install nginx if you haven't already:
+```
+$ sudo apt update
+$ sudo apt install nginx
+```
+Next, configure the reverse proxy server:
+```
+$ sudo vim /etc/nginx/sites-available/default
+```
+Replace the `server` block of code with the following, and save:
+```
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/html;
+
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+            proxy_pass http://localhost:8888;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+}
+```
+Check the config syntax, and if that checks out, restart Nginx:
+```
+$ sudo nginx -t
+$ sudo systemctl restart nginx
+```
+
+Now if you go to the Pi's IP address in your browser you should be directed to 
+the Mulitbase Sever webapp, from which you can manage the base and all of its 
+cameras.
+
+NOTE: If you are having trouble adding a camera to the Base, from the 
 Base home user interface (the page you get to after loging in and 
 clicking the "admin" button under the base entry), 
 try "restoring the network" (hamburger menu -> Restore Network). 
@@ -278,8 +338,16 @@ already been registered to the base.
 
 ### SSH into Pi
 To remotely login to the Pi via SSH, the Pi's SSH needs to be enabled from 
-the Raspberry Pi configuration menu (hopefully this was done at setup). You 
-then need to find the Pi's IP address on the network, which I've found is 
+the Raspberry Pi configuration menu (hopefully this was done at setup).
+
+If avahi-daemon is running (as described in the Update Network Settings 
+section above), SSHing into the pi is as simple as:
+
+```
+$ ssh animl@animl-base.local
+```
+
+If not, you need to find the Pi's IP address on the network, which I've found is 
 simple if the Pi is connected to a screen and you can use the terminal. Just 
 run either of the following commands:
 ```
@@ -295,7 +363,7 @@ network for it, `arp -a` or
 be helpful.
 
 Once you have the Pi's IP address, you can SSH into it with 
-`ssh [USER]@[IP ADDRESS]`, e.g.: 
+`ssh [USER]@[IP ADDRESS]`, e.g.:
 ```
 $ ssh animl@192.168.0.227
 ```
@@ -320,12 +388,3 @@ TODO: figure out where to store shared creds for the webap and add instructions
 here
 
 ### TODO: Accessing logs
-
-
-
-
-
-
-
-
-
