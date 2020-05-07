@@ -112,7 +112,9 @@ Add the following line to the bottom of the file:
 ```
 UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
 ```
-5. Once the fstab file is saved, mount all drives by running
+5. Once the fstab file is saved, mount all drives by running. NOTE: if the 
+drive is already mounted, unmount it first (`umount /dev/sda1` might 
+do the trick).
 ```
 $ sudo mount -a
 ```
@@ -132,8 +134,17 @@ $ sudo tar -xjf /path/to/FILENAME.tbz
 
 3. Follow the installation instructions in `mbase/README.TXT' to complete the 
 installation. In step 3 of the instructions, when you are asked to edit and copy 
-the contents of `mbase/becmbse-sample.conf` to `etc/becmbse.conf`, use the 
-following settings (you can copy/paste the entire thing): 
+the contents of `mbase/becmbse-sample.conf` to `etc/becmbse.conf`. You 
+may run into permissions issues. The following commands will copy the file to 
+`/etc/`, rename it, and change the owner to "animl".
+```
+$ sudo cp /usr/local/mbse/becmbse-sample.conf /etc/
+$ sudo mv /etc/becmbse-sample.conf /etc/becmbse.conf
+$ sudo chown animl:animl /etc/becmbse.conf
+```
+
+At which point you can copy/paste the following settings into the config file 
+and save it: 
 
 ```
 #This is where the writeable items (config and pictures) are stored.
@@ -165,7 +176,7 @@ DEFAULTPARAMS=-B
 
 4. Add `usr/local/mbase` to the "animl" user's PATH via `~/.profile`:
 ```
-$ vim ~/.proffile
+$ vim ~/.profile
 ```
 Copy the following line to the bottom of the file and save:
 ```
@@ -173,10 +184,13 @@ PATH="/usr/local/mbse:$PATH"
 ```
 
 ### Start Multibase Server and Animl Base as daemons
+If you haven't plugged the Buckeye X-series PC Base to the Pi, you 
+can do that now. 
+
 We use [PM2](https://pm2.keymetrics.io/docs) to manage the application 
 processes. To start both the Buckeye Multibase Server and Animl Base up as 
 daemons that will run in the background and automatically launch on restart, 
-run:
+navigate to `~/animl-base/animl-base` and run:
 
 ```
 $ npm run start-daemon
@@ -200,6 +214,13 @@ Multibase Server edition serves a locally-accessible web application for
 managing the deployed devices, which can be found at `localhost:8888` when 
 Mulibase is running.
 
+NOTEL: If you are having trouble adding a camera to the Base, from the 
+Base home user interface (the page you get to after loging in and 
+clicking the "admin" button under the base entry), 
+try "restoring the network" (hamburger menu -> Restore Network). 
+This will search for and locate any devices that were have 
+already been registered to the base.
+
 
 ## Managment
 TODO: provide guidance for SSH-ing into the Pi and other remote 
@@ -209,9 +230,9 @@ managment related tasks
 Run any of the following to check if the apps are already running in the 
 background via pm2:
 ```
-$ pm2 list
+$ pm2 list all
 $ pm2 status
-$ pm2 show app
+$ pm2 show animl-base
 ```
 
 ### TODO: Pulling down Animl Base updates from github and restarting remotely
