@@ -3,8 +3,8 @@ Animl Base is a node application deployed on Rasberry Pi that ingests new images
 from a Buckeye wireless camera trap base station and uploads them to S3.
 
 ## Table of Contents
-- [Related repos](#Related repos)
-- [Raspberry Pi setup](#Rasberry Pi setup)
+- [Related repos](#related-repos)
+- [Raspberry Pi setup](#rasberry-pi-setup)
 - [Managment](#Managment)
 
 ## Related repos
@@ -340,8 +340,9 @@ already been registered to the base.
 To remotely login to the Pi via SSH, the Pi's SSH needs to be enabled from 
 the Raspberry Pi configuration menu (hopefully this was done at setup).
 
-If avahi-daemon is running (as described in the Update Network Settings 
-section above), SSHing into the pi is as simple as:
+If avahi-daemon is running (as described 
+[above](https://github.com/tnc-ca-geo/animl-base/blob/master/README.md#double-check-that-avahi-daemon-is-installed-and-running), 
+SSHing into the pi is as simple as:
 
 ```
 $ ssh animl@animl-base.local
@@ -402,7 +403,10 @@ $ pm2 restart all
 ### Local webapp for managing Buckeye cams
 Multibase Server edition serves a locally-accessible web application for 
 managing the deployed devices, which can be found at `localhost:8888` when 
-Mulibase is running.
+Mulibase is running. If you configured Nginx as a reverse proxy as described 
+[above](https://github.com/tnc-ca-geo/animl-base#local-webapp-for-managing-buckeye-cams),
+you can access the webapp remotely by navigating to the Pi's IP address in your 
+browser.
 
 TODO: figure out where to store shared creds for the webap and add instructions 
 here
