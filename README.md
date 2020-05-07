@@ -3,8 +3,8 @@ Animl Base is a node application deployed on Rasberry Pi that ingests new images
 from a Buckeye wireless camera trap base station and uploads them to S3.
 
 ## Table of Contents
-- [Related repos](#Related repos)
-- [Raspberry Pi setup](#Rasberry Pi setup)
+- [Related repos](#related-repos)
+- [Raspberry Pi setup](#rasberry-pi-setup)
 - [Managment](#Managment)
 
 ## Related repos
