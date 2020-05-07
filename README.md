@@ -370,14 +370,34 @@ $ ssh animl@192.168.0.227
 
 ### Check the status of the apps
 Run any of the following to check if the apps are already running in the 
-background via pm2:
+background via pm2 (see 
+[PM2 Cheatsheet](https://pm2.keymetrics.io/docs/usage/quick-start/#cheatsheet)):
 ```
 $ pm2 list all
 $ pm2 status
+```
+
+Use the following to check the status of animl-base specifically:
+```
 $ pm2 show animl-base
 ```
 
-### TODO: Pulling down Animl Base updates from github and restarting remotely
+or Multibase Server:
+```
+$ mbasectl -i
+```
+
+### Pulling down Animl Base updates from github and restarting remotely
+SSH into the PI
+```
+$ ssh animl@animl-base.local
+```
+
+navigate to `~/animl-base/animl-base`, pull down the changes, and restart PM2:
+```
+$ git pull
+$ pm2 restart all
+```
 
 ### Local webapp for managing Buckeye cams
 Multibase Server edition serves a locally-accessible web application for 
