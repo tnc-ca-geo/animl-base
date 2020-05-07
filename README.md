@@ -2,6 +2,11 @@
 Animl Base is a node application deployed on Rasberry Pi that ingests new images 
 from a Buckeye wireless camera trap base station and uploads them to S3.
 
+## Table of Contents
+- [Related repos](#Related repos)
+- [Raspberry Pi setup](#Rasberry Pi setup)
+- [Managment](#Managment)
+
 ## Related repos
 - Animl lambda function   http://github.com/tnc-ca-geo/animl-lambda
 - Animl ML resources      http://github.com/tnc-ca-geo/animl-ml
@@ -104,17 +109,16 @@ $ sudo vim /etc/hostname
 And replace "raspberrypi" with "animl-base".
 
 #### Double check that avahi-daemon is installed and running
-One of the easiest ways to connect remotely to you Pi and identify it on a 
+One of the easiest ways to connect remotely to your Pi and identify it on a 
 local network is with mDNS (good explainer on that 
 [here](https://www.howtogeek.com/167190/how-and-why-to-assign-the-.local-domain-to-your-raspberry-pi/)).
-If have Avahi installed and running on the Pi as described in that article, all 
-you need to do to SSH into your pi from within your local network is run 
+If you have Avahi installed and running on the Pi as described in that article, 
+all  you need to do to SSH into your pi from within your local network is run 
 `ssh [USER]@[HOSTNAME].local. So in our case:
 ```
 $ ssh animl@animl-base.local
 ```
-This saves you from having to search for or remember the IP address of the Pi.
-
+This saves you from having to search for or remember the IP address of the Pi. 
 Avahi This may have already been installed with the OS. To check, run:
 ```
 $ avahi-daemon -V

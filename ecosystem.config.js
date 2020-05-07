@@ -9,12 +9,9 @@ module.exports = {
     // watch: false,
     max_memory_restart: '1G',
     exp_backoff_restart_delay: 100,
-    env: {
-      NODE_ENV: 'development'
-    },
-    env_production: {
-      NODE_ENV: 'production'
-    }
+    error_file: 'logs/animl-base/err.log',
+    out_file: 'logs/animl-base/out.log',
+    log_file: 'logs/animl-base/combined.log',
   },
   {
     name: 'multibase-server-edition',
@@ -25,6 +22,9 @@ module.exports = {
     autorestart: true,
     exp_backoff_restart_delay: 100,
     // watch: false,
+    error_file: 'logs/mbase/err.log',
+    out_file: 'logs/mbase/out.log',
+    log_file: 'logs/mbase/combined.log',
   }, 
 ],
 
