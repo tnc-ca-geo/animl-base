@@ -15,22 +15,19 @@ from a Buckeye wireless camera trap base station and uploads them to S3.
 
 ## Rasberry Pi setup
 The current hardware includes: 
-- Raspberry Pi 4b (4GB)
-- SD card (64GB)
-- SSD external drive (250GB)
+- Raspberry Pi 3b
+- USB flash drive (250GB)
 
 ### Set up Pi
 
-#### Step 1 - load Rasbian to the SD card:
+#### Step 1 - Set up Pi to boot from the USB flash drive:
 
-1. Format the SD card using a desktop computer with the SD card 
-[memory card formatter](https://www.sdcard.org/downloads/formatter/)
-2. Download the Rasberry Pi Imager for your OS 
-[here](https://www.raspberrypi.org/downloads/) and step through wizard to burn 
-the Rasbian image to the SD card
-3. Eject the SD card from your desktop computer, insert into Pi, plug 
-in the Pi to turn it on, and step through the setup wizard
-4. If you weren't prompted to change the pi user password in the setup 
+1. Good instructions on how to burn the Raspberry Pi OS to a flash drive and 
+configure the RPi to boot from it 
+[here](https://pimylifeup.com/raspberry-pi-boot-from-usb/). You'll need an SD 
+card temporarily but won't need it once the RPi has been configured.
+3. Start up the Pi and step through the set up wizard.
+2. If you weren't prompted to change the pi user password in the setup 
 wizard, change the password by opening the terminal, enter `passwd` on the 
 command line and press Enter. You'll be prompted to 
 enter your current password to authenticate (if you haven't set it yet the 
@@ -68,10 +65,11 @@ $ sudo npm install -g pm2
 $ sudo apt install nginx
 ```
 
-2. Create a directory to store the app, cd into it, clone the repo, and install
-node dependencies:
+2. Create a directory to store the data and a directory for the app, 
+cd into the latter, clone the repo, and install node dependencies:
 
 ```
+$ mkdir /home/animl/data
 $ mkdir /home/animl/animl-base
 $ cd /home/animl/animl-base
 $ git clone https://github.com/tnc-ca-geo/animl-base.git
@@ -87,11 +85,22 @@ AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
 AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
 
 # Directory to watch
-IMG_DIR = '/media/animl-drive/data/'
+IMG_DIR = '/home/animl/data/'
 
 # S3 
 AWS_REGION = us-west-1
 DEST_BUCKET = animl-images
+```
+
+4. Lastly, now that we have Vim we can modify the lightdm.conf file to make 
+'animl' the user that gets logged in automatically upon booting up. 
+
+```
+$ sudo vim /etc/lightdm/lightdm.conf
+```
+and replace 'pi' in the following line with 'animl':
+```
+autologin-user=pi
 ```
 
 ### Update network settings
@@ -141,41 +150,6 @@ It's also worth mapping the fixed IP address to the device's MAC address in
 your router configuration, so another devices can't take it when the Pi isn't 
 connected.
 
-### Format and mount SSD drive
-1. Plug in the hard drive and format it to ext4 (instructions can be found 
-[here](https://raspberrytips.com/format-mount-usb-drive/))
-2. Create the mount point and make the animl user the owner of it (decent 
-instructions on this [here](https://www.htpcguides.com/properly-mount-usb-storage-raspberry-pi/))
-```
-$ sudo mkdir /media/animl-drive
-$ sudo chown -R animl:animl /media/animl-drive
-$ sudo chmod -R 775 /media/animl-drive
-```
-3. Find the uuid of the drive by running the following command and looking 
-for entries at `/dev/sda1`. Copy the uuid as we'll need it in the next step.
-```
-sudo blkid
-```
-4. Amend the `/etc/fstab` file so that the Pi automatically mounts the 
-drive on boot.
-```
-$ sudo vim /etc/fstab
-```
-Add the following line to the bottom of the file:
-```
-UUID=XXXXX-XXXXX-XXXXX /media/animl-drive ext4 nofail,noatime,auto 0 0
-```
-5. Once the fstab file is saved, mount all drives by running. NOTE: if the 
-drive is already mounted, unmount it first (`umount /dev/sda1` might 
-do the trick).
-```
-$ sudo mount -a
-```
-6. Finally, create a `/media/animl-drive/data` directory
-```
-$ mkdir /media/animl-drive/data
-```
-
 ### Set up Buckeye server software (Multibase Server Edition)
 1. Download the Mbase [tarball](https://www.buckeyecam.com/getfile.php?file=mbse-latest-armv7hl.tbz)
 and unzip using 
@@ -185,7 +159,7 @@ $ sudo tar -xjf /path/to/FILENAME.tbz
 
 2. Move the `mbase` directory to `/usr/local`
 
-3. Follow the installation instructions in `mbase/README.TXT' to complete the 
+3. Follow the installation instructions in `mbase/README.TXT` to complete the 
 installation. In step 3 of the instructions, when you are asked to edit and copy 
 the contents of `mbase/becmbse-sample.conf` to `etc/becmbse.conf`. You 
 may run into permissions issues. The following commands will copy the file to 
@@ -204,7 +178,7 @@ and save it:
 #It cannot be the same as the program installation directory.
 #This directory must be writeable by the user that the daemon
 #will run as.
-DATADIR=/media/animl-drive/data
+DATADIR=/home/animl/data
 
 #Use and group.  May be name or number. Should not be root (0).
 #The user may also need permission to access USB devices.

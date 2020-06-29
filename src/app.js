@@ -25,15 +25,16 @@ async function uploadNewFile(filePath) {
   const hash = await utils.createHash(filePath, __dirname);
   let uploadParams = { Bucket: config.aws.bucket };
   let fileStream = fs.createReadStream(filePath);
-  fileStream.on('error', err => console.log('File Error', err));
+  fileStream.on('error', err => console.log('File stream error: ', err));
   uploadParams.Body = fileStream;
   uploadParams.Key = hash + ext;
 
   s3.upload(uploadParams, (err, data) => {
     if (err) {
-      console.log('Error', err);
-    } if (data) {
-      console.log('Upload Success', data);
+      console.log('Error uploading image: ', err);
+    }
+    if (data) {
+      console.log('Upload success: ', data);
     }
   });
   
