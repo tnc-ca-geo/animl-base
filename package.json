@@ -20,11 +20,17 @@
   "homepage": "https://github.com/tnc-ca-geo/animl-base#readme",
   "dependencies": {
     "aws-sdk": "^2.639.0",
+    "backo": "^1.1.0",
     "chokidar": "^3.3.1",
     "dotenv": "^8.2.0",
+    "lowdb": "^1.0.0",
     "md5": "^2.2.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "eslint": "^7.3.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "nodemon": "^2.0.2",
+    "prettier": "^2.0.5"
   }
 }

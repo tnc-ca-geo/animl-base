@@ -1,58 +1,38 @@
-const fs = require('fs');
-const config = require('./config/index');
-const AWS = require('aws-sdk');
-const path = require('path');
 const chokidar = require('chokidar');
+const Queue = require('./utils/queue');
 const utils = require('./utils/utils');
+const config = require('./config/index');
 
-console.log('Starting Animl Base. Watching directory: ', config.imgDir);
-
-// Connect to AWS
-AWS.config.update({ region: config.aws.region });
-const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
-
-// Handle new images
-async function uploadNewFile(filePath) {
-
-  const ext = path.extname(filePath);
-  if (!config.supportedFileTypes.includes(ext)) {
-    console.log('Not a supported filetype');
-    return;
+async function handleNewFile(filePath, queue) {
+  console.log(`New file detected: ${filePath}`);
+  if (utils.validateFile(filePath)) {
+    queue.add(filePath);
   }
+}
 
-  console.log('Uploading file: ' + filePath + ' to ' + config.aws.bucket);
+async function start() {
+  console.log('Starting Animl Base');
 
-  const hash = await utils.createHash(filePath, __dirname);
-  let uploadParams = { Bucket: config.aws.bucket };
-  let fileStream = fs.createReadStream(filePath);
-  fileStream.on('error', err => console.log('File stream error: ', err));
-  uploadParams.Body = fileStream;
-  uploadParams.Key = hash + ext;
+  // Initialize queue
+  let queue = new Queue(config);
+  await queue.init();
 
-  s3.upload(uploadParams, (err, data) => {
-    if (err) {
-      console.log('Error uploading image: ', err);
-    }
-    if (data) {
-      console.log('Upload success: ', data);
-    }
+  // Initialize watcher
+  const watcher = chokidar.watch(config.imgDir, {
+    ignored: /(^|[\/\\])\../, // ignore dotfiles
+    ignoreInitial: true, // ignore files in the directory on start
+    persistent: true,
   });
-  
-};
 
-// Initialize watcher
-const watcher = chokidar.watch(config.imgDir, {
-  ignored: /(^|[\/\\])\../, // ignore dotfiles
-  ignoreInitial: true, // ignore files in the directory on start
-  persistent: true,
-});
+  // Register listeners
+  watcher
+    .on('ready', () => console.log(`Watching for changes to ${config.imgDir}`))
+    .on('add', (path) => handleNewFile(path, queue))
+    .on('error', (error) => console.log(`Watcher error: ${error}`));
 
-// Add event listeners
-watcher
-  .on('ready', () => console.log('Initial scan complete. Ready for changes'))
-  .on('add', filePath => uploadNewFile(filePath))
-  .on('error', error => console.log(`Watcher error: ${error}`));
+  // Clean up & shut down
+  process.on('SIGTERM', (code) => utils.gracefulShutDown(code, watcher));
+  process.on('SIGINT', (code) => utils.gracefulShutDown(code, watcher));
+}
 
-// Clean up & shut down
-process.on('SIGTERM', utils.gracefulShutDown);
-process.on('SIGINT', utils.gracefulShutDown)
+start();

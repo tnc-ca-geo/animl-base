@@ -1,20 +1,32 @@
 const fs = require('fs');
+const path = require('path');
 const md5 = require('md5');
+const config = require('../config/index');
+
+function validateFile(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (!config.supportedFileTypes.includes(ext)) {
+    console.log('Not a supported filetype: ', filePath);
+    return false;
+  }
+  return true;
+}
 
 function createHash(filePath) {
   return new Promise(function (resolve, reject) {
-    fs.readFile(filePath, function(err, buf) {
+    fs.readFile(filePath, (err, buf) => {
       !err ? resolve(md5(buf)) : reject(err);
     });
   });
-};
+}
 
-function gracefulShutDown () {
-  console.log('\nShutting down Animl Base...')
+function gracefulShutDown(code, watcher) {
+  console.log(`\nExiting Animl Base with code ${code}`);
   watcher.close().then(() => console.log('Closed'));
-};
+}
 
 module.exports = {
+  validateFile,
   createHash,
   gracefulShutDown,
-}
+};

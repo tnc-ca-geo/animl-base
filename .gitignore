@@ -1,3 +1,6 @@
+# Flat file db
+db.json
+
 # Logs
 logs
 *.log
