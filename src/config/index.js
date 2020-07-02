@@ -8,6 +8,8 @@ module.exports = {
   dbFile: 'db.json',
   aws: {
     bucket: process.env.DEST_BUCKET,
+    region: process.env.AWS_REGION,
+    stagingDir: process.env.S3_STAGING_DIR,
   },
   watcher: {
     ignored: /(^|[\/\\])\../, // ignore dotfiles

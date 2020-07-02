@@ -1,12 +1,26 @@
 const chokidar = require('chokidar');
 const Queue = require('./utils/queue');
 const Worker = require('./utils/worker');
-const utils = require('./utils/utils');
 const config = require('./config/index');
+
+function shutDown(code, watcher, worker) {
+  console.log(`\nExiting Animl Base with code ${code}`);
+  worker.stop();
+  watcher.close().then(() => console.log('Closed'));
+}
+
+function validateFile(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (!config.supportedFileTypes.includes(ext)) {
+    console.log('Not a supported filetype: ', filePath);
+    return false;
+  }
+  return true;
+}
 
 function handleNewFile(filePath, queue) {
   console.log(`New file detected: ${filePath}`);
-  if (utils.validateFile(filePath)) {
+  if (validateFile(filePath)) {
     queue.add(filePath);
   }
 }
@@ -32,10 +46,10 @@ async function start() {
 
   // Clean up & shut down
   process.on('SIGTERM', (code) => {
-    utils.gracefulShutDown(code, watcher, worker);
+    shutDown(code, watcher, worker);
   });
   process.on('SIGINT', (code) => {
-    utils.gracefulShutDown(code, watcher, worker);
+    shutDown(code, watcher, worker);
   });
 }
 

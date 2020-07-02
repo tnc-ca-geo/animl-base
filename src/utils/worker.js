@@ -30,8 +30,8 @@ class Worker {
       // get first job & process
       const img = await this.queue.getFirst();
       await this.s3.upload(img.path);
-      await this.queue.remove(img.path);
       console.log('Upload success');
+      await this.queue.remove(img.path);
 
       // Reset backoff and poll again
       this.backoff.reset();
