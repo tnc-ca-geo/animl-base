@@ -20,8 +20,9 @@ function createHash(filePath) {
   });
 }
 
-function gracefulShutDown(code, watcher) {
+function gracefulShutDown(code, watcher, worker) {
   console.log(`\nExiting Animl Base with code ${code}`);
+  worker.stop();
   watcher.close().then(() => console.log('Closed'));
 }
 
