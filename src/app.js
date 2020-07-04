@@ -1,3 +1,4 @@
+const path = require('path');
 const chokidar = require('chokidar');
 const Queue = require('./utils/queue');
 const Worker = require('./utils/worker');

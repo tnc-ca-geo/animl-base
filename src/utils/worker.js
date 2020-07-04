@@ -18,7 +18,6 @@ class Worker {
   }
 
   async poll() {
-    console.log('Queue length: ', this.queue.size);
     if (this.queue.size === 0) {
       this.timer = setTimeout(() => {
         this.poll();
@@ -28,6 +27,7 @@ class Worker {
 
     try {
       // get first job & process
+      console.log('Queue length: ', this.queue.size);
       const img = await this.queue.getFirst();
       await this.s3.upload(img.path);
       console.log('Upload success');

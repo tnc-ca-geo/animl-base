@@ -17,14 +17,13 @@ class S3Service {
     try {
       console.log('Uploading file: ' + filePath + ' to ' + this.config.bucket);
       const fileName = path.basename(filePath);
-      const key = this.config.stagingDir + '/' + fileName;
       let fileStream = fs.createReadStream(filePath);
       fileStream.on('error', (err) => console.log('File stream error: ', err));
 
       let params = {
         Bucket: this.config.bucket,
         Body: fileStream,
-        Key: key,
+        Key: fileName,
       };
 
       return this.s3.upload(params).promise();
