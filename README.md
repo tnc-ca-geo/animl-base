@@ -45,8 +45,8 @@ $ su - animl
 ```
 
 ### Install Animl Base and dependencies
-1. Once the Pi is up and running, enable SSH from the Raspberry Pi configuration 
-menu, and download some additional global dependencies 
+1. Once the Pi is up and running, enable SSH and VNC from the Raspberry Pi 
+configuration menu, and download some additional global dependencies 
 (node, vim, git, awscli, pm2, nginx):
 
 ```
@@ -335,12 +335,25 @@ $ ifconfig
 However, if you don't have direct access to the Pi and are trying to scan a 
 network for it, `arp -a` or 
 [nmap](https://www.theurbanpenguin.com/find-my-raspberry-pi-using-nmap/) might 
-be helpful.
+be helpful. Other approaches to try can be found 
+[here](https://www.raspberrypi.org/documentation/remote-access/ip-address.md).
 
 Once you have the Pi's IP address, you can SSH into it with 
 `ssh [USER]@[IP ADDRESS]`, e.g.:
 ```
 $ ssh animl@192.168.0.227
+```
+
+### Use VNC as remote desktop
+Good instructions for VNC set up and access 
+[here](https://www.raspberrypi.org/documentation/remote-access/vnc/)
+
+### Use AnyDesk as remote desktop
+[Download](https://anydesk.com/en/downloads/raspberry-pi) any desk on the pi 
+then run 
+
+```
+$ sudo apt install <path-to-anydesk.deb file>
 ```
 
 ### Check the status of the apps
