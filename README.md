@@ -44,7 +44,7 @@ $ sudo vim /etc/dphys-swapfile
 ```
 
 Make sure all `CONF_SWAPFILE` settings are commented out. In particular 
-`#CONF_SWAPSIZE` and `#CONF_SWAPFACTOR. See 
+`#CONF_SWAPSIZE` and `#CONF_SWAPFACTOR`. See 
 [this](https://www.raspberrypi.org/forums/viewtopic.php?t=221762#p1360310) 
 forum discussion for reference. Changes will take hold after reboot:
 ```
