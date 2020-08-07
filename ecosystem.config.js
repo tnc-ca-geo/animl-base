@@ -7,9 +7,13 @@ module.exports = {
       // args: 'one two',
       instances: 1,
       autorestart: true,
-      // watch: false,
+      watch: true,
       max_memory_restart: '1G',
       exp_backoff_restart_delay: 100,
+      error_file: 'err.log',
+      out_file: 'out.log',
+      log_file: 'combined.log',
+      time: true,
     },
     {
       name: 'multibase-server-edition',
@@ -19,7 +23,7 @@ module.exports = {
       instances: 1,
       autorestart: true,
       exp_backoff_restart_delay: 100,
-      // watch: false,
+      watch: true,
     },
   ],
 };
