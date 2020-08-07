@@ -26,7 +26,7 @@ module.exports = {
       // watch: true,
     },
     {
-      name: 'temperature logger',
+      name: 'temperature-logger',
       script: 'python temp-monitor.py',
       instances: 1,
       autorestart: true,
