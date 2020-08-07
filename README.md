@@ -26,12 +26,30 @@ The current hardware includes:
 configure the RPi to boot from it 
 [here](https://pimylifeup.com/raspberry-pi-boot-from-usb/). You'll need an SD 
 card temporarily but won't need it once the RPi has been configured.
-3. Start up the Pi and step through the set up wizard.
-2. If you weren't prompted to change the pi user password in the setup 
+2. Start up the Pi and step through the set up wizard.
+3. If you weren't prompted to change the pi user password in the setup 
 wizard, change the password by opening the terminal, enter `passwd` on the 
 command line and press Enter. You'll be prompted to 
 enter your current password to authenticate (if you haven't set it yet the 
 default pw is `raspberry`), and then asked for a new password.
+4. ***Increase swap size*** - we found that the 100MB default swap size is 
+insufficient, and recommend increasing it significantly. If the USB flash drive 
+is formatted in ext4 (as it should be if you followed step 1), this is as 
+simple as opening the /etc/dphys-swapfile config, commenting out the lines that 
+restric swap size so that the system computes it automatically 
+(it should result in 2x the RAM of the device, so 1.83 GB in the case of the 
+RPi 3B). 
+```
+$ sudo vim /etc/dphys-swapfile
+```
+
+Make sure all `CONF_SWAPFILE` settings are commented out. In particular 
+`#CONF_SWAPSIZE` and `#CONF_SWAPFACTOR. See 
+[this](https://www.raspberrypi.org/forums/viewtopic.php?t=221762#p1360310) 
+forum discussion for reference. Changes will take hold after reboot:
+```
+$ sudo reboot
+```
 
 #### Step 2 - Create new user called "animl"
 The "animl" user will be the primary owner/user of all application files, 
@@ -85,7 +103,7 @@ AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
 AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
 
 # Directory to watch
-IMG_DIR = '/home/animl/data/'
+IMG_DIR = '/home/animl/data/<base name>/cameras/'
 
 # S3 
 AWS_REGION = us-west-1
@@ -157,11 +175,11 @@ and unzip using
 $ sudo tar -xjf /path/to/FILENAME.tbz
 ```
 
-2. Move the `mbase` directory to `/usr/local`
+2. Move the `mbse` directory to `/usr/local`
 
-3. Follow the installation instructions in `mbase/README.TXT` to complete the 
+3. Follow the installation instructions in `mbse/README.TXT` to complete the 
 installation. In step 3 of the instructions, when you are asked to edit and copy 
-the contents of `mbase/becmbse-sample.conf` to `etc/becmbse.conf`. You 
+the contents of `mbse/becmbse-sample.conf` to `etc/becmbse.conf`. You 
 may run into permissions issues. The following commands will copy the file to 
 `/etc/`, rename it, and change the owner to "animl".
 ```
@@ -201,7 +219,7 @@ USBSERV="y"
 DEFAULTPARAMS=-B 
 ```
 
-4. Add `usr/local/mbase` to the "animl" user's PATH via `~/.profile`:
+4. Add `usr/local/mbse` to the "animl" user's PATH via `~/.profile`:
 ```
 $ vim ~/.profile
 ```

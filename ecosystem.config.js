@@ -1,5 +1,5 @@
 module.exports = {
-  apps : [
+  apps: [
     {
       name: 'animl-base',
       script: './src/app.js',

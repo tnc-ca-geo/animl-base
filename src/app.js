@@ -46,9 +46,9 @@ async function start() {
   worker.poll();
 
   // Clean up & shut down
-  // process.on('SIGTERM', (code) => {
-  //   shutDown(code, watcher, worker);
-  // });
+  process.on('SIGTERM', (code) => {
+    shutDown(code, watcher, worker);
+  });
   process.on('SIGINT', (code) => {
     shutDown(code, watcher, worker);
   });
