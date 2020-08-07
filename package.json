@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test-desktop": "aws-vault exec home -- nodemon src/app.js",
-    "start-daemon": "pm2 start",
+    "start-daemon": "sudo pm2 start",
     "start": "node src/app.js"
   },
   "repository": {

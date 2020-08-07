@@ -17,13 +17,14 @@ module.exports = {
     },
     {
       name: 'multibase-server-edition',
-      script: 'mbasectl -s',
+      // script: 'mbasectl -s',
+      script: '/usr/local/mbse/mbasectl',
+      args: '-s',
       // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
-      // args: 'one two',
       instances: 1,
       autorestart: true,
       exp_backoff_restart_delay: 100,
-      watch: true,
+      // watch: true,
     },
   ],
 };
