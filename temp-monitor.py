@@ -4,7 +4,7 @@ from gpiozero import CPUTemperature
 from time import sleep, strftime, time
 
 TEMP_LOG = os.path.abspath(
-  os.path.join(os.path.dirname(__file__), "cpu_temp.csv"))
+  os.path.join(os.path.dirname(__file__), "cpu_temp_log.csv"))
 PAUSE_INTERVAL = 60
 cpu = CPUTemperature()
 
