@@ -23,7 +23,7 @@ module.exports = {
       instances: 1,
       autorestart: true,
       exp_backoff_restart_delay: 100,
-      // watch: true,
+      watch: false,
     },
     {
       name: 'temperature-logger',
@@ -31,6 +31,7 @@ module.exports = {
       instances: 1,
       autorestart: true,
       exp_backoff_restart_delay: 100,
+      watch: false,
     },
   ],
 };
