@@ -21,6 +21,7 @@ module.exports = {
       instances: 1,
       autorestart: true,
       exp_backoff_restart_delay: 100,
+      interpreter: '/usr/bin/python',
       watch: false,
     },
   ],
