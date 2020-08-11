@@ -66,6 +66,16 @@ $ sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,netd
 $ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopasswd
 $ su - animl
 ```
+Modify the lightdm.conf file to make 'animl' the user that gets logged in 
+automatically upon booting up. 
+
+```
+$ sudo nano /etc/lightdm/lightdm.conf
+```
+and replace 'pi' in the following line with 'animl':
+```
+autologin-user=pi
+```
 
 
 ### Update network settings
@@ -114,6 +124,12 @@ you can modify the Raspberry Pi’s DHCP client daemon
 It's also worth mapping the fixed IP address to the device's MAC address in 
 your router configuration, so another devices can't take it when the Pi isn't 
 connected.
+
+#### Download AnyDesk
+We use AnyDesk for remoting into the Pi when it's in the field. You can 
+download it [here](https://anydesk.com/en/downloads/raspberry-pi). Once you 
+have it downloaded and installed, make note of your AnyDesk Address, and be 
+sure to set a password to allow for unattended access.
 
 
 ### Set up Buckeye server software (Multibase Server Edition)
@@ -222,17 +238,6 @@ IMG_DIR = '/home/animl/data/<base name>/cameras/'
 # S3 
 AWS_REGION = us-west-1
 DEST_BUCKET = animl-data-staging
-```
-
-4. Lastly, now that we have Vim we can modify the lightdm.conf file to make 
-'animl' the user that gets logged in automatically upon booting up. 
-
-```
-$ sudo vim /etc/lightdm/lightdm.conf
-```
-and replace 'pi' in the following line with 'animl':
-```
-autologin-user=pi
 ```
 
 

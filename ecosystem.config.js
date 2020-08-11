@@ -7,7 +7,7 @@ module.exports = {
       // args: 'one two',
       instances: 1,
       autorestart: true,
-      watch: true,
+      watch: false,
       max_memory_restart: '1G',
       exp_backoff_restart_delay: 100,
       error_file: 'err.log',
@@ -15,16 +15,16 @@ module.exports = {
       log_file: 'combined.log',
       time: true,
     },
-    {
-      name: 'multibase-server-edition',
-      script: 'mbasectl -s',
-      // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
-      // args: 'one two',
-      instances: 1,
-      autorestart: true,
-      exp_backoff_restart_delay: 100,
-      watch: false,
-    },
+    // {
+    //   name: 'multibase-server-edition',
+    //   script: 'mbasectl -s',
+    //   // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
+    //   // args: 'one two',
+    //   instances: 1,
+    //   autorestart: true,
+    //   exp_backoff_restart_delay: 100,
+    //   watch: false,
+    // },
     {
       name: 'temperature-logger',
       script: 'python temp-monitor.py',
