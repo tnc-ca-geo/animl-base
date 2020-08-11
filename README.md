@@ -40,7 +40,7 @@ restric swap size so that the system computes it automatically
 (it should result in 2x the RAM of the device, so 1.83 GB in the case of the 
 RPi 3B). 
 ```
-$ sudo vim /etc/dphys-swapfile
+$ sudo nano /etc/dphys-swapfile
 ```
 
 Make sure all `CONF_SWAPFILE` settings are commented out. In particular 
@@ -49,6 +49,11 @@ Make sure all `CONF_SWAPFILE` settings are commented out. In particular
 forum discussion for reference. Changes will take hold after reboot:
 ```
 $ sudo reboot
+```
+
+After rebooting, you can confirm that swap size was inceased with the command:
+```
+$ swapon
 ```
 
 #### Step 2 - Create new user called "animl"
@@ -62,64 +67,6 @@ $ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopas
 $ su - animl
 ```
 
-### Install Animl Base and dependencies
-1. Once the Pi is up and running, enable SSH and VNC from the Raspberry Pi 
-configuration menu, and download some additional global dependencies 
-(node, vim, git, awscli, pm2, nginx):
-
-```
-$ sudo apt update
-$ sudo apt full-upgrade -y
-```
-```
-$ curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash
-$ sudo apt-get install -y nodejs
-```
-```
-$ sudo apt-get install vim -y
-$ sudo apt-get install git
-$ sudo apt-get install awscli
-$ sudo npm install -g pm2
-$ sudo apt install nginx
-```
-
-2. Create a directory to store the data and a directory for the app, 
-cd into the latter, clone the repo, and install node dependencies:
-
-```
-$ mkdir /home/animl/data
-$ mkdir /home/animl/animl-base
-$ cd /home/animl/animl-base
-$ git clone https://github.com/tnc-ca-geo/animl-base.git
-$ cd animl-base
-$ npm install
-```
-
-3. Add a .env file to the project's root directory with the following items: 
-
-```
-# AWS creds
-AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
-AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
-
-# Directory to watch
-IMG_DIR = '/home/animl/data/<base name>/cameras/'
-
-# S3 
-AWS_REGION = us-west-1
-DEST_BUCKET = animl-images
-```
-
-4. Lastly, now that we have Vim we can modify the lightdm.conf file to make 
-'animl' the user that gets logged in automatically upon booting up. 
-
-```
-$ sudo vim /etc/lightdm/lightdm.conf
-```
-and replace 'pi' in the following line with 'animl':
-```
-autologin-user=pi
-```
 
 ### Update network settings
 #### Change the pi's hostname
@@ -127,12 +74,12 @@ This step is not necessary but may be helpful to better distinguish the pi on
 the network. To change the Pi's default hostname from "raspberrypi" to 
 "animl-base", first update the `/etc/hosts` file:
 ```
-$ sudo vim /etc/hosts
+$ sudo nano /etc/hosts
 ```
 replace "raspberrypi" with "animl-base" in the last line of the file and save. 
 Then open `/etc/hostname`:
 ```
-$ sudo vim /etc/hostname
+$ sudo nano /etc/hostname
 ```
 And replace "raspberrypi" with "animl-base".
 
@@ -168,8 +115,9 @@ It's also worth mapping the fixed IP address to the device's MAC address in
 your router configuration, so another devices can't take it when the Pi isn't 
 connected.
 
+
 ### Set up Buckeye server software (Multibase Server Edition)
-1. Download the Mbase [tarball](https://www.buckeyecam.com/getfile.php?file=mbse-latest-armv7hl.tbz)
+1. Download the Mbase [tarball](https://www.buckeyecam.com/main/Files/mbse-armv7hl.tbz)
 and unzip using 
 ```
 $ sudo tar -xjf /path/to/FILENAME.tbz
@@ -227,6 +175,66 @@ Copy the following line to the bottom of the file and save:
 ```
 PATH="/usr/local/mbse:$PATH"
 ```
+
+### Install Animl Base and dependencies
+1. Once the Pi is up and running, enable SSH and VNC from the Raspberry Pi 
+configuration menu, and download some additional global dependencies 
+(node, vim, git, awscli, nginx, pm2):
+
+```
+$ sudo apt update
+$ sudo apt full-upgrade -y
+```
+```
+$ curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash
+$ sudo apt-get install -y nodejs
+```
+```
+$ sudo apt-get install vim -y
+$ sudo apt-get install git -y
+$ sudo apt-get install awscli -y
+$ sudo apt-get install nginx -y
+$ sudo npm install -g pm2
+```
+
+2. Create a directory to store the data and a directory for the app, 
+cd into the latter, clone the repo, and install node dependencies:
+
+```
+$ mkdir /home/animl/data
+$ mkdir /home/animl/animl-base
+$ cd /home/animl/animl-base
+$ git clone https://github.com/tnc-ca-geo/animl-base.git
+$ cd animl-base
+$ npm install
+```
+
+3. Add a .env file to the project's root directory with the following items: 
+
+```
+# AWS creds
+AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
+AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
+
+# Directory to watch
+IMG_DIR = '/home/animl/data/<base name>/cameras/'
+
+# S3 
+AWS_REGION = us-west-1
+DEST_BUCKET = animl-data-staging
+```
+
+4. Lastly, now that we have Vim we can modify the lightdm.conf file to make 
+'animl' the user that gets logged in automatically upon booting up. 
+
+```
+$ sudo vim /etc/lightdm/lightdm.conf
+```
+and replace 'pi' in the following line with 'animl':
+```
+autologin-user=pi
+```
+
 
 ### Start Multibase Server and Animl Base as daemons
 If you haven't plugged the Buckeye X-series PC Base to the Pi, you 
