@@ -2,23 +2,12 @@ const path = require('path');
 const chokidar = require('chokidar');
 const Queue = require('./utils/queue');
 const Worker = require('./utils/worker');
-const { spawn } = require('child_process');
+const Multibase = require('./utils/multibase');
 const config = require('./config/index');
 
-function shutDown(code, watcher, worker) {
+function shutDown(code, watcher, worker, mbase) {
   console.log(`\nExiting Animl Base with code ${code}`);
-  const mbase = spawn('mbasectl', '-k', { shell: true });
-  mbase.stdout.on('data', (data) => {
-    console.log('mbase stdout: ', data.toString());
-  });
-
-  mbase.stderr.on('data', (data) => {
-    console.error('mbase stderr: ', data.toString());
-  });
-
-  mbase.on('exit', (code) => {
-    console.log(`mbase exited with code ${code}`);
-  });
+  mbase.stop();
   worker.stop();
   watcher.close().then(() => console.log('Closed'));
 }
@@ -43,19 +32,8 @@ async function start() {
   console.log('Starting Animl Base');
 
   // Starting Buckeye Multibase Server
-  const mbase = spawn('mbasectl', '-s', { shell: true });
-  mbase.stdout.on('data', (data) => {
-    console.log('mbase stdout: ', data.toString());
-  });
-
-  mbase.stderr.on('data', (data) => {
-    console.error('mbase stderr: ', data.toString());
-  });
-
-  mbase.on('exit', (code) => {
-    console.log(`mbase exited with code ${code}`);
-  });
-
+  let mbase = new Multibase();
+  mbase.start();
 
   // Initialize queue
   let queue = new Queue(config);
@@ -75,10 +53,10 @@ async function start() {
 
   // Clean up & shut down
   process.on('SIGTERM', (code) => {
-    shutDown(code, watcher, worker);
+    shutDown(code, watcher, worker, mbase);
   });
   process.on('SIGINT', (code) => {
-    shutDown(code, watcher, worker);
+    shutDown(code, watcher, worker, mbase);
   });
 }
 
