@@ -193,9 +193,8 @@ PATH="/usr/local/mbse:$PATH"
 ```
 
 ### Install Animl Base and dependencies
-1. Once the Pi is up and running, enable SSH and VNC from the Raspberry Pi 
-configuration menu, and download some additional global dependencies 
-(node, vim, git, awscli, nginx, pm2):
+1. Enable SSH and VNC from the Raspberry Pi configuration menu, and download 
+some additional global dependencies (node, vim, git, awscli, nginx, pm2):
 
 ```
 $ sudo apt update
@@ -240,11 +239,11 @@ AWS_REGION = us-west-1
 DEST_BUCKET = animl-data-staging
 ```
 
-4. To configure logrotate to rotate all logs from animl-base, the temerature 
-monitoring script, and mutibase server, first create the logrotate config file:
+4. To configure logrotate to rotate all logs from animl-base and the temerature 
+monitoring script, first create the logrotate config file:
 
 ```
-sudo vim /etc/logrotate.d/animl
+$ sudo vim /etc/logrotate.d/animl
 ```
 
 then copy/paste/save the following config:
@@ -264,18 +263,18 @@ then copy/paste/save the following config:
 You can then test the configuration with:
 
 ```
-sudo logrotate /etc/logrotate.conf --debug
+$ sudo logrotate /etc/logrotate.conf --debug
 ```
 
 
-### Start Multibase Server and Animl Base as daemons
+### Start Multibase Server and Animl Base and temp-monitor.py as daemons
 If you haven't plugged the Buckeye X-series PC Base to the Pi, you 
 can do that now. 
 
 We use [PM2](https://pm2.keymetrics.io/docs) to manage the application 
-processes. To start both the Buckeye Multibase Server and Animl Base up as 
-daemons that will run in the background and automatically launch on restart, 
-navigate to `~/animl-base/animl-base` and run:
+processes. To start the Buckeye Multibase Server, Animl Base, and the 
+temp-monitor.py script up as daemons that will run in the background and 
+automatically launch on restart, navigate to `~/animl-base/animl-base` and run:
 
 ```
 $ npm run start-daemon
@@ -294,69 +293,13 @@ This will save the current state of PM2 (with Animl Base and Mulitbase
 running) in a dump file that will be used when they system starts or when 
 resurrecting PM2.
 
-_NOTE: PM2 can start the Multibase Server because we can set it to execute the 
-`mbasectl -s` startup command via the PM2 ecosystem config file, but it can not 
-stop or otherwise control it because it's not a node app. Instead, you can use 
-the following commands to manage the Multibase Server:_
-```
-# Get status of multibase server:
-$ mbasectl -i
 
-# Stop the server:
-$ mbasectl -k
-
-# Start the server:
-$ mbasectl -s
-```
+## Managment
 
 ### Local webapp for managing Buckeye cams
 Multibase Server edition serves a locally-accessible web application for 
 managing the deployed devices, which can be found at `localhost:8888` from 
 within the Pi when Mulibase is running.
-
-To access the webapp remotely, we can 
-[use Nginx as a reverse proxy server](https://dev.to/bogdaaamn/run-your-nodejs-application-on-a-headless-raspberry-pi-4jnn) 
-to redirect all external traffic from the Pi's port 80 to the Mulitbase Server 
-web app running on port 8888. To do so, install nginx if you haven't already:
-```
-$ sudo apt update
-$ sudo apt install nginx
-```
-Next, configure the reverse proxy server:
-```
-$ sudo vim /etc/nginx/sites-available/default
-```
-Replace the `server` block of code with the following, and save:
-```
-server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-
-        root /var/www/html;
-
-        index index.html index.htm index.nginx-debian.html;
-
-        server_name _;
-
-        location / {
-            proxy_pass http://localhost:8888;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection 'upgrade';
-            proxy_set_header Host $host;
-            proxy_cache_bypass $http_upgrade;
-        }
-}
-```
-Check the config syntax, and if that checks out, restart Nginx:
-```
-$ sudo nginx -t
-$ sudo systemctl restart nginx
-```
-
-Now if you go to the Pi's IP address in your browser you should be directed to 
-the Mulitbase Sever webapp, from which you can manage the base and all of its 
-cameras.
 
 NOTE: If you are having trouble adding a camera to the Base, from the 
 Base home user interface (the page you get to after loging in and 
@@ -364,9 +307,6 @@ clicking the "admin" button under the base entry),
 try "restoring the network" (hamburger menu -> Restore Network). 
 This will search for and locate any devices that were have 
 already been registered to the base.
-
-
-## Managment
 
 ### SSH into Pi
 To remotely login to the Pi via SSH, the Pi's SSH needs to be enabled from 
@@ -439,21 +379,24 @@ SSH into the PI
 $ ssh animl@animl-base.local
 ```
 
-navigate to `~/animl-base/animl-base`, pull down the changes, and restart PM2:
+navigate to `~/animl-base/animl-base`, stop PM2, pull down the changes, and restart PM2:
 ```
+$ pm2 stop all
 $ git pull
 $ pm2 restart all
 ```
 
-### Local webapp for managing Buckeye cams
-Multibase Server edition serves a locally-accessible web application for 
-managing the deployed devices, which can be found at `localhost:8888` when 
-Mulibase is running. If you configured Nginx as a reverse proxy as described 
-[above](https://github.com/tnc-ca-geo/animl-base#local-webapp-for-managing-buckeye-cams),
-you can access the webapp remotely by navigating to the Pi's IP address in your 
-browser.
+### Accessing logs
+***PM2 logs*** can be viewed via the terminal with:
+```
+$ pm2 logs --lines 100
+# or, if you just want to see the last 30 lines of a specific app, use:
+$ pm2 logs animl-base --lines 30
+```
 
-TODO: figure out where to store shared creds for the webap and add instructions 
-here
+The complete log files can be found in `/home/animl/.pm2/logs/`.
 
-### TODO: Accessing logs
+The ***temperature monitor*** logs can be found in the 
+`/home/animl/animl-base/animl-base/` directory (they're CSV files).
+
+The Multibase Server Edition logs can be found in `/home/animl/data/<base ID>/`.
