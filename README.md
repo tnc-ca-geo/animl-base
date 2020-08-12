@@ -240,6 +240,33 @@ AWS_REGION = us-west-1
 DEST_BUCKET = animl-data-staging
 ```
 
+4. To configure logrotate to rotate all logs from animl-base, the temerature 
+monitoring script, and mutibase server, first create the logrotate config file:
+
+```
+sudo vim /etc/logrotate.d/animl
+```
+
+then copy/paste/save the following config:
+
+```
+/home/animl/.pm2/pm2.log /home/animl/.pm2/logs/*.log /home/animl/animl-base/animl-base/*.csv {
+        rotate 24
+        weekly
+        missingok
+        notifempty
+        compress
+        delaycompress
+        copytruncate
+}
+```
+
+You can then test the configuration with:
+
+```
+sudo logrotate /etc/logrotate.conf --debug
+```
+
 
 ### Start Multibase Server and Animl Base as daemons
 If you haven't plugged the Buckeye X-series PC Base to the Pi, you 
