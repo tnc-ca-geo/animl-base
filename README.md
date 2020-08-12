@@ -194,7 +194,7 @@ PATH="/usr/local/mbse:$PATH"
 
 ### Install Animl Base and dependencies
 1. Enable SSH and VNC from the Raspberry Pi configuration menu, and download 
-some additional global dependencies (node, vim, git, awscli, nginx, pm2):
+some additional global dependencies (node, vim, git, awscli, pm2):
 
 ```
 $ sudo apt update
@@ -208,7 +208,6 @@ $ sudo apt-get install -y nodejs
 $ sudo apt-get install vim -y
 $ sudo apt-get install git -y
 $ sudo apt-get install awscli -y
-$ sudo apt-get install nginx -y
 $ sudo npm install -g pm2
 ```
 
