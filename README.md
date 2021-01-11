@@ -143,6 +143,11 @@ download it [here](https://anydesk.com/en/downloads/raspberry-pi). Once you
 have it downloaded and installed, make note of your AnyDesk Address, and be 
 sure to set a password to allow for unattended access.
 
+NOTE: If you're using an RPi 4b, you may need to trick the Pi into thinking there is a monitor attached in order for Anydesk to work. To do so, make sure the ```hdmi_force_hotplug=1``` setting in the ```/boot/config.txt``` file is ***uncommented***:
+```shell
+sudo nano /boot/config.txt
+```
+
 ### Set up Sixfab Power software
 Instructions can be found towards the bottom of the page [here](https://docs.sixfab.com/docs/sixfab-power-getting-started). A few configurations to set:
 - A scheduled event to reboot the device (via Hardware) once a day
@@ -151,13 +156,13 @@ Instructions can be found towards the bottom of the page [here](https://docs.six
 
 ### Set up Buckeye server software (Multibase Server Edition) and register new base
 1. Create new directory for the camera trap data
-```
+```shell
 $ mkdir /home/animl/data
 ```
 
 2. Download the Mbase [tarball](https://www.buckeyecam.com/main/Files/mbse-armv7hl.tbz)
 and unzip using 
-```
+```shell
 $ sudo tar -xjf /path/to/FILENAME.tbz
 ```
 
@@ -168,7 +173,7 @@ installation. In step 3 of the instructions, when you are asked to edit and copy
 the contents of `mbse/becmbse-sample.conf` to `etc/becmbse.conf`. You 
 may run into permissions issues. The following commands will copy the file to 
 `/etc/`, rename it, and change the owner to "animl".
-```
+```shell
 $ sudo cp /usr/local/mbse/becmbse-sample.conf /etc/
 $ sudo mv /etc/becmbse-sample.conf /etc/becmbse.conf
 $ sudo chown animl:animl /etc/becmbse.conf
@@ -206,7 +211,7 @@ DEFAULTPARAMS=-B
 ```
 
 5. Add `usr/local/mbse` to the "animl" user's PATH via `~/.profile`:
-```
+```shell
 $ vim ~/.profile
 ```
 Copy the following line to the bottom of the file and save:
@@ -216,11 +221,11 @@ PATH="/usr/local/mbse:$PATH"
 You may need to close out of that shell and start a new one, restart the Pi, or switch users to the ```pi``` user and back to ```animl``` before the PATH will be updated.
 
 6. Add your new base. Plug in the base to the RPi, then start up the the Multibase SE app from the terminal with:
-```
+```shell
 $ mbasectl -s
 ```
 Next, open up a browser and go to ```localhost:8888``` to access the Buckeye web app and login with the default credentials (default UN is ```Animl```, PW is ```lmina```). Navigate to ```Tools > Add Base```, and complete base registration. Once the base is added, make note of the serial number (if you're unsure, a directory named with the serial number will have been automatically created under ```/home/animal/data/```. You'll need that for the .env file you create in the next step. You can close out the browser window and kill the Multibase SE app: 
-```
+```shell
 $ mbasectl -k
 ```
 
@@ -228,15 +233,15 @@ $ mbasectl -k
 1. Enable SSH and VNC from the Raspberry Pi configuration menu, and download 
 some additional global dependencies (node, vim, git, awscli, pm2):
 
-```
+```shell
 $ sudo apt update
 $ sudo apt full-upgrade -y
 ```
-```
+```shell
 $ curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash
 $ sudo apt-get install -y nodejs
 ```
-```
+```shell
 $ sudo apt-get install vim -y
 $ sudo apt-get install git -y
 $ sudo apt-get install awscli -y
@@ -245,7 +250,7 @@ $ sudo npm install -g pm2
 
 2. Create a directory for the animl-base application code, cd into it, clone the repo, and install node dependencies:
 
-```
+```shell
 $ mkdir /home/animl/animl-base
 $ cd /home/animl/animl-base
 $ git clone https://github.com/tnc-ca-geo/animl-base.git
@@ -271,7 +276,7 @@ DEST_BUCKET = animl-data-staging
 4. To configure logrotate to rotate all logs from animl-base and the temerature 
 monitoring script, first create the logrotate config file:
 
-```
+```shell
 $ sudo vim /etc/logrotate.d/animl
 ```
 
@@ -291,7 +296,7 @@ then copy/paste/save the following config:
 
 You can then test the configuration with:
 
-```
+```shell
 $ sudo logrotate /etc/logrotate.conf --debug
 ```
 
@@ -305,17 +310,17 @@ processes. To start the Buckeye Multibase Server, Animl Base, and the
 temp-monitor.py script up as daemons that will run in the background and 
 automatically launch on restart, navigate to `~/animl-base/animl-base` and run:
 
-```
+```shell
 $ npm run start-daemon
 ```
 
 Next, to generate a script that will launch PM2 on boot together with the 
 application, run: 
-```
+```shell
 $ pm2 startup systemd
 ```
 Then copy and run the generated command, and finally run:
-```
+```shell
 $ pm2 save
 ```
 This will save the current state of PM2 (with Animl Base and Mulitbase 
@@ -329,18 +334,18 @@ resurrecting PM2.
 Run any of the following from the Pi's terminal to check if the apps are already running in the 
 background via pm2 (see 
 [PM2 Cheatsheet](https://pm2.keymetrics.io/docs/usage/quick-start/#cheatsheet)):
-```
+```shell
 $ pm2 list all
 $ pm2 status
 ```
 
 Use the following to check the status of animl-base specifically:
-```
+```shell
 $ pm2 show animl-base
 ```
 
 or Multibase Server:
-```
+```shell
 $ mbasectl -i
 ```
 
@@ -355,7 +360,7 @@ Good instructions for VNC set up and access
 [Download](https://anydesk.com/en/downloads/raspberry-pi) any desk on the pi 
 then run 
 
-```
+```shell
 $ sudo apt install <path-to-anydesk.deb file>
 ```
 
@@ -377,17 +382,17 @@ If avahi-daemon is running (as described
 [above](https://github.com/tnc-ca-geo/animl-base/blob/master/README.md#double-check-that-avahi-daemon-is-installed-and-running), 
 SSHing into the pi is as simple as:
 
-```
+```shell
 $ ssh animl@animl-base.local
 ```
 
 If not, you need to find the Pi's IP address on the network, which I've found is 
 simple if the Pi is connected to a screen and you can use the terminal. Just 
 run either of the following commands:
-```
+```shell
 $ hostname -I
 ```
-```
+```shell
 $ ifconfig
 ```
 
@@ -399,18 +404,18 @@ be helpful. Other approaches to try can be found
 
 Once you have the Pi's IP address, you can SSH into it with 
 `ssh [USER]@[IP ADDRESS]`, e.g.:
-```
+```shell
 $ ssh animl@192.168.0.227
 ```
 
 ### Pulling down Animl Base updates from github and restarting remotely
 SSH into the PI
-```
+```shell
 $ ssh animl@animl-base.local
 ```
 
 navigate to `~/animl-base/animl-base`, stop PM2, pull down the changes, and restart PM2:
-```
+```shell
 $ pm2 stop all
 $ git pull
 $ pm2 restart all
@@ -418,7 +423,7 @@ $ pm2 restart all
 
 ### Accessing logs
 ***PM2 logs*** can be viewed via the terminal with:
-```
+```shell
 $ pm2 logs --lines 100
 # or, if you just want to see the last 30 lines of a specific app, use:
 $ pm2 logs animl-base --lines 30
