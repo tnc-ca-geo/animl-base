@@ -2,6 +2,8 @@
 Animl Base is a node application deployed on Rasberry Pi that ingests new images 
 from a Buckeye wireless camera trap base station and uploads them to S3.
 
+> NOTE: Login credentials for the Santa Cruz Island camera trap systems can be found [here](https://tnc.app.box.com/file/762650708780). To request access, please contact nathaniel.rindlaub@tnc.org
+
 ## Table of Contents
 - [Related repos](#related-repos)
 - [Raspberry Pi setup](#rasberry-pi-setup)
