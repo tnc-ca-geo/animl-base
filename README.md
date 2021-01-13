@@ -10,10 +10,13 @@ from a Buckeye wireless camera trap base station and uploads them to S3.
 - [Managment](#Managment)
 
 ## Related repos
-- Animl lambda function   http://github.com/tnc-ca-geo/animl-lambda
+- Animl API               http://github.com/tnc-ca-geo/animl-api
+- Animl frontend          http://github.com/tnc-ca-geo/animl-frontend
+- Animl base program      http://github.com/tnc-ca-geo/animl-base
+- Animl ingest function   http://github.com/tnc-ca-geo/animl-ingest
 - Animl ML resources      http://github.com/tnc-ca-geo/animl-ml
 - Animl desktop app       https://github.com/tnc-ca-geo/animl-desktop
-- Animl cloud platform    https://github.com/tnc-ca-geo/animl
+
 
 ## Rasberry Pi setup
 The current hardware includes: 
