@@ -20,7 +20,7 @@ from a Buckeye wireless camera trap base station and uploads them to S3.
 
 ## Rasberry Pi setup
 The current hardware includes: 
-- [Raspberry Pi 4b (4B)](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/), though RPi 3B is reccomended if running off solar
+- [Raspberry Pi 4B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/), though RPi 3B is reccomended if running off solar
 - [Sixfab Power Managment and UPS HAT](https://sixfab.com/power/) and [battery](https://www.18650batterystore.com/products/panasonic-ncr18650b)
 - [Buckeye X80 PC Base Receiver](https://store.buckeyecam.com/wireless-receivers/x80-pc-base-receiver.html)
 - [PoE Injector](https://www.amazon.com/gp/product/B00BK4W8TQ/ref=ppx_yo_dt_b_asin_title_o06_s01?ie=UTF8&psc=1)
