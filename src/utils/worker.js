@@ -2,9 +2,10 @@ const Backoff = require('backo');
 const S3Service = require('./s3Service');
 
 class Worker {
-  constructor(config, queue) {
+  constructor(config, queue, imgWatcher) {
     this.queue = queue;
     this.awsConfig = config.aws;
+    this.imgWatcher = imgWatcher;
     this.pollInterval = config.pollInterval;
     this.backoff = new Backoff({
       min: config.backoff.base,
@@ -32,6 +33,13 @@ class Worker {
       await this.s3.upload(img.path);
       console.log('Upload success');
       await this.queue.remove(img.path);
+      await this.imgWatcher.unwatch(img.path);
+
+      // Just for testing...
+      const filesWatched = imgWatcher.getWatched();
+      Object.keys(filesWatched).forEach((dir) => {
+        console.log(`Number of files in ${dir} : ${filesWatched[dir].length}`);
+      });
 
       // Reset backoff and poll again
       this.backoff.reset();

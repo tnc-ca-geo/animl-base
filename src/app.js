@@ -48,8 +48,14 @@ async function start() {
     .on('add', (path) => handleNewFile(path, queue))
     .on('error', (err) => console.log(`imgWatcher error: ${err}`));
 
+  // Just for testing...
+  const filesWatched = imgWatcher.getWatched();
+  Object.keys(filesWatched).forEach((dir) => {
+    console.log(`Number of files in ${dir} : ${filesWatched[dir].length}`);
+  });
+
   // Initialize worker
-  let worker = new Worker(config, queue);
+  let worker = new Worker(config, queue, imgWatcher);
   await worker.init();
   worker.poll();
 

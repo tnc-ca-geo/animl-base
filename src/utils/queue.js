@@ -36,8 +36,7 @@ class Queue {
 
   async getFirst() {
     try {
-      const first = await this.db.get('imgQueue').first().value();
-      return first;
+      return await this.db.get('imgQueue').first().value();
     } catch (err) {
       console.log(`Error retrieving first job from queue: `, err);
     }
@@ -45,8 +44,7 @@ class Queue {
 
   async getState() {
     try {
-      const state = await this.db.getState();
-      return state;
+      return await this.db.getState();
     } catch (err) {
       console.log(`Error getting queue state: `, err);
     }
