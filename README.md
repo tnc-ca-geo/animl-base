@@ -230,8 +230,11 @@ $ npm install
 AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
 AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
 
-# Directory to watch
+# Image directory to watch
 IMG_DIR = '/home/animl/data/<base name>/cameras/'
+
+# Log file to watch
+LOG_FILE = '/home/animl/data/<base name>/log.txt'
 
 # S3 
 AWS_REGION = us-west-1

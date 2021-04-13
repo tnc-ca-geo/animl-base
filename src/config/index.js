@@ -6,6 +6,7 @@ dotenv.config();
 module.exports = {
   imgDir: process.env.IMG_DIR,
   dbFile: 'db.json',
+  logFile: process.env.LOG_FILE,
   aws: {
     bucket: process.env.DEST_BUCKET,
     region: process.env.AWS_REGION,
