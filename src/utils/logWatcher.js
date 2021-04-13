@@ -10,9 +10,14 @@ class S3Service {
   async init() {
     AWS.config.logger = console;
     AWS.config.update({ region: this.config.region });
+    console.log('initializeing cloudwatch');
     this.cloudwatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' });
     try {
+      console.log('watching log file: ', this.config.logFile);
       this.tail = new Tail(this.config.logFile);
+      this.tail('line', (data) => {
+        console.log('testing tail: ', data);
+      });
       this.tail('line', async (data) => {
         console.log('new line on log watcher: ', data);
         if (data.includes('pics counter')) {
