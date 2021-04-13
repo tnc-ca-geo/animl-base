@@ -1,7 +1,6 @@
 const moment = require('moment');
 const Tail = require('tail').Tail;
 const AWS = require('aws-sdk');
-const config = require('./config/index');
 
 class S3Service {
   constructor(config) {
