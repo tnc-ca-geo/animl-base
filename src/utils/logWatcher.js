@@ -14,7 +14,7 @@ class S3Service {
     this.cloudwatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' });
     try {
       this.tail = new Tail(this.config.logFile);
-      this.tail('line', (data) => {
+      this.tail('line', async (data) => {
         console.log('new line on log watcher: ', data);
         if (data.includes('pics counter')) {
           await this.handlePicCounterEvent(data);
