@@ -428,6 +428,7 @@ navigate to `~/animl-base/animl-base`, stop PM2, pull down the changes, and rest
 ```shell
 $ pm2 stop all
 $ git pull
+$ npm install # if dependencies changed
 $ pm2 restart all
 ```
 
