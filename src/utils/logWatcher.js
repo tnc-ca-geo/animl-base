@@ -27,11 +27,11 @@ class S3Service {
     console.log('parsig pic counter event: ', data);
     let re = new RegExp(/\d+/);
     const event = data.split(':EVENT:');
-    const timestamp = moment(event[0], 'YYYY/MM/DD hh:mm:ss');
+    const timestamp = moment(event[0], 'YYYY/MM/DD hh:mm:ss').unix();
     const msg = event[1].split(',');
     const camera = msg[0].match(re);
     const picCount = msg[1].match(re);
-    return { timestamp, camera, picCount }
+    return { timestamp, camera, picCount };
   }
 
   async handlePicCounterEvent(data) {
@@ -50,20 +50,20 @@ class S3Service {
             Dimensions: [
               {
                 Name: 'camera',
-                Value: event.camera,
+                Value: 'camera ' + event.camera,
               },
             ],
             // StorageResolution: '5',
             Timestamp: event.timestamp,
             Unit: 'Count',
-            Value: event.picCount,
+            Value: Number(event.picCount),
           },
         ],
         Namespace: 'Animl',
       };
       return await this.cloudwatch.putMetricData(params).promise();
     } catch (e) {
-      console.log('Error pushing pic counter metric to cloudwatch: ', e)
+      console.log('Error pushing pic counter metric to cloudwatch: ', e);
     }
   }
 
