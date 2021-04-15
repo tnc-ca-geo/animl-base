@@ -10,13 +10,10 @@ class S3Service {
   async init() {
     AWS.config.logger = console;
     AWS.config.update({ region: this.config.region });
-    console.log('initializeing cloudwatch');
     this.cloudwatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' });
     try {
-      console.log('watching log file: ', this.config.logFile);
       this.tail = new Tail(this.config.logFile);
       this.tail.on('line', async (data) => {
-        console.log('new line on log watcher: ', data);
         if (data.includes('pics counter')) {
           await this.handlePicCounterEvent(data);
         }
@@ -64,7 +61,7 @@ class S3Service {
         ],
         Namespace: 'Animl',
       };
-      return await cloudwatch.putMetricData(params).promise();
+      return await this.cloudwatch.putMetricData(params).promise();
     } catch (e) {
       console.log('Error pushing pic counter metric to cloudwatch: ', e)
     }

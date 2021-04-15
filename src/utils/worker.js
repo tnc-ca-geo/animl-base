@@ -36,7 +36,7 @@ class Worker {
       await this.imgWatcher.unwatch(img.path); // TODO: test whether this works
 
       // Just for testing...
-      const filesWatched = imgWatcher.getWatched();
+      const filesWatched = this.imgWatcher.getWatched();
       Object.keys(filesWatched).forEach((dir) => {
         console.log(`Number of files in ${dir} : ${filesWatched[dir].length}`);
       });
