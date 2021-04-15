@@ -310,6 +310,13 @@ You can then test the configuration with:
 $ sudo logrotate /etc/logrotate.conf --debug
 ```
 
+5. Lastly, increase the the maximum number of files the RPi can watch. This 
+is a good idea because the Animl Base app watches for changes to the directories 
+that Multibase SE adds image files to, so as the number of images stored on the RPi 
+grows, you begin to exhaust the default number (8,192) of files the system can watch.
+
+To increase it, perform the steps described [here](https://klequis.io/error-enospc-system-limit-for-number-of-file-watchers-reached/)
+
 
 ### Start Multibase Server and Animl Base and temp-monitor.py as daemons
 If you haven't plugged the Buckeye X-series PC Base to the Pi, you 

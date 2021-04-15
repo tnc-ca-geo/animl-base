@@ -15,10 +15,7 @@ class S3Service {
     try {
       console.log('watching log file: ', this.config.logFile);
       this.tail = new Tail(this.config.logFile);
-      this.tail('line', (data) => {
-        console.log('testing tail: ', data);
-      });
-      this.tail('line', async (data) => {
+      this.tail.on('line', async (data) => {
         console.log('new line on log watcher: ', data);
         if (data.includes('pics counter')) {
           await this.handlePicCounterEvent(data);
