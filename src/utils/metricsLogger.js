@@ -139,7 +139,7 @@ class MetricsLogger {
             ],
             Timestamp: now.unix(),
             Unit: 'Seconds',
-            Value: picLatency,
+            Value: latency,
           },
         ],
         Namespace: 'Animl',
