@@ -3,15 +3,15 @@ const chokidar = require('chokidar');
 const Queue = require('./utils/queue');
 const Worker = require('./utils/worker');
 const Multibase = require('./utils/multibase');
-const LogWatcher = require('./utils/logWatcher');
+const MetricsLogger = require('./utils/metricsLogger');
 const config = require('./config/index');
 
-function shutDown(code, imgWatcher, logWatcher, worker, mbase) {
+function shutDown(code, imgWatcher, metricsLogger, worker, mbase) {
   console.log(`\nExiting Animl Base with code ${code}`);
   mbase.stop();
   worker.stop();
   imgWatcher.close().then(() => console.log('Closed'));
-  logWatcher.stop();
+  metricsLogger.stop();
 }
 
 function validateFile(filePath) {
@@ -23,10 +23,11 @@ function validateFile(filePath) {
   return true;
 }
 
-function handleNewFile(filePath, queue) {
+function handleNewFile(filePath, queue, metricsLogger) {
   console.log(`New file detected: ${filePath}`);
   if (validateFile(filePath)) {
     queue.add(filePath);
+    metricsLogger.handleNewImage(filePath);
   }
 }
 
@@ -37,6 +38,10 @@ async function start() {
   let mbase = new Multibase();
   mbase.start();
 
+  // Initialize metrics logger
+  let metricsLogger = new MetricsLogger(config);
+  await metricsLogger.init();
+
   // Initialize queue
   let queue = new Queue(config);
   await queue.init();
@@ -45,7 +50,7 @@ async function start() {
   const imgWatcher = chokidar.watch(config.imgDir, config.watcher);
   imgWatcher
     .on('ready', () => console.log(`Watching for changes to ${config.imgDir}`))
-    .on('add', (path) => handleNewFile(path, queue))
+    .on('add', (path) => handleNewFile(path, queue, metricsLogger))
     .on('error', (err) => console.log(`imgWatcher error: ${err}`));
 
   // Just for testing...
@@ -59,16 +64,12 @@ async function start() {
   await worker.init();
   worker.poll();
 
-  // Initialize log watcher
-  let logWatcher = new LogWatcher(config);
-  await logWatcher.init();
-
   // Clean up & shut down
   process.on('SIGTERM', (code) => {
-    shutDown(code, imgWatcher, logWatcher, worker, mbase);
+    shutDown(code, imgWatcher, metricsLogger, worker, mbase);
   });
   process.on('SIGINT', (code) => {
-    shutDown(code, imgWatcher, logWatcher, worker, mbase);
+    shutDown(code, imgWatcher, metricsLogger, worker, mbase);
   });
 }
 

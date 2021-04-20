@@ -1,13 +1,16 @@
 const moment = require('moment');
 const Tail = require('tail').Tail;
 const AWS = require('aws-sdk');
+const ExifImage = require('exif').ExifImage;
 
-class S3Service {
+class MetricsLogger {
   constructor(config) {
     this.config = config;
+    this.baseId = path.basename(path.dirname(config.logFile));
   }
 
   async init() {
+    // initialize tailing of mbase log file
     AWS.config.logger = console;
     AWS.config.update({ region: this.config.region });
     this.cloudwatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' });
@@ -21,6 +24,22 @@ class S3Service {
     } catch (e) {
       console.log('Error watching multibase log file: ', e);
     }
+  }
+
+  getExif(filePath) {
+    return new Promise(function (resolve, reject) {
+      try {
+        new ExifImage({ image: filePath }, function (error, exifData) {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(exifData);
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   parsePicCountEvent(data) {
@@ -42,18 +61,21 @@ class S3Service {
     console.log(`count: ${event.picCount}`);
 
     try {
-      // Push to cloudwatch metrics
+      // publish to cloudwatch metrics
       var params = {
         MetricData: [
           {
             MetricName: 'PicCount',
             Dimensions: [
               {
+                Name: 'base',
+                Value: this.baseId,
+              },
+              {
                 Name: 'camera',
                 Value: 'camera ' + event.camera,
               },
             ],
-            // StorageResolution: '5',
             Timestamp: event.timestamp,
             Unit: 'Count',
             Value: Number(event.picCount),
@@ -67,12 +89,18 @@ class S3Service {
     }
   }
 
+  async handleNewImage(filePath) {
+    console.log('Extracting Exif data...');
+    const exif = await this.getExif(filePath);
+    console.log('exif: ', exif);
+  }
+
   stop() {
-    console.log('Stopping logWatcher');
+    console.log('Stopping metricsLogger');
     if (this.tail) {
       this.tail.unwatch();
     }
   }
 }
 
-module.exports = S3Service;
+module.exports = MetricsLogger;
