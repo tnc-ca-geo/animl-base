@@ -238,7 +238,7 @@ $ mbasectl -k
 
 ### Install Animl Base and dependencies
 1. Enable SSH and VNC from the Raspberry Pi configuration menu, and download 
-some additional global dependencies (node, vim, git, awscli, pm2):
+some additional global dependencies (node, vim, git, awscli, exiftool, pm2):
 
 ```shell
 $ sudo apt update
@@ -252,6 +252,7 @@ $ sudo apt-get install -y nodejs
 $ sudo apt-get install vim -y
 $ sudo apt-get install git -y
 $ sudo apt-get install awscli -y
+$ sudo apt-get install libimage-exiftool-perl
 $ sudo npm install -g pm2
 ```
 

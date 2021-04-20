@@ -1,8 +1,9 @@
 const path = require('path');
+const fs = require('fs');
 const moment = require('moment');
 const Tail = require('tail').Tail;
 const AWS = require('aws-sdk');
-const ExifImage = require('exif').ExifImage;
+var exif = require('exiftool');
 
 class MetricsLogger {
   constructor(config) {
@@ -30,11 +31,17 @@ class MetricsLogger {
   getExif(filePath) {
     return new Promise(function (resolve, reject) {
       try {
-        new ExifImage({ image: filePath }, function (error, exifData) {
-          if (error) {
-            reject(error);
+        fs.readFile(filePath, function (err, data) {
+          if (err) {
+            throw err;
           } else {
-            resolve(exifData);
+            exif.metadata(data, function (err, metadata) {
+              if (err) {
+                throw err;
+              } else {
+                resolve(metadata);
+              }
+            });
           }
         });
       } catch (error) {
@@ -66,7 +73,7 @@ class MetricsLogger {
       var params = {
         MetricData: [
           {
-            MetricName: 'PicCount',
+            MetricName: 'PicCount', // rename PicCountOnCamera
             Dimensions: [
               {
                 Name: 'base',
@@ -94,12 +101,12 @@ class MetricsLogger {
     console.log('Extracting Exif data...');
     const metadata = await this.getExif(filePath);
     console.log('metadata: ', metadata);
-    // TODO: caclulate time between DateTimeOriginal and now
-    const dto = moment(metadata.exif.DateTimeOriginal, 'YYYY:MM:DD hh:mm:ss');
-    console.log('dto: ', dto);
-    const now = moment();
-    const lag = now.diff(dto, 'seconds');
-    console.log('lag: ', lag);
+    // TODO: caclulate latency (lag between when image was taken and now)
+    // const dto = moment(metadata.exif.DateTimeOriginal, 'YYYY:MM:DD hh:mm:ss');
+    // console.log('dto: ', dto);
+    // const now = moment();
+    // const latency = now.diff(dto, 'seconds');
+    // console.log('lag: ', latency);
     // TODO: publish to Cloudwatch
   }
 
