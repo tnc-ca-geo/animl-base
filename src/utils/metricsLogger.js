@@ -56,10 +56,8 @@ class MetricsLogger {
       const idField = fields.find((field) => field.includes('CAMERAID'));
       const idFieldValue = idField.split('=')[1];
       const camera = idFieldValue.split(',')[0];
-      console.log('camera: ', camera);
       let re = new RegExp(/\d+/);
       const camNumber = camera.match(re)[0];
-      console.log('camNumber: ', camNumber);
       return camNumber;
     } catch (e) {
       console.log('Error parsing metadata for cam number: ', e);
@@ -67,22 +65,22 @@ class MetricsLogger {
   }
 
   parsePicCountEvent(data) {
-    console.log('parsig pic counter event: ', data);
-    let re = new RegExp(/\d+/);
-    const event = data.split(':EVENT:');
-    const timestamp = moment(event[0], 'YYYY/MM/DD hh:mm:ss').unix();
-    const msg = event[1].split(',');
-    const camNumber = msg[0].match(re);
-    const picCount = msg[1].match(re);
-    return { timestamp, camNumber, picCount };
+    try {
+      let re = new RegExp(/\d+/);
+      const event = data.split(':EVENT:');
+      const timestamp = moment(event[0], 'YYYY/MM/DD hh:mm:ss').unix();
+      const msg = event[1].split(',');
+      const camNumber = msg[0].match(re);
+      const picCount = msg[1].match(re);
+      return { timestamp, camNumber, picCount };
+    } catch (e) {
+      console.log('Error parsing pic count event from mbase logs: ', e);
+    }
   }
 
   async handlePicCounterEvent(data) {
     // Parse event
     const event = this.parsePicCountEvent(data);
-    console.log(`timestamp: ${event.timestamp}`);
-    console.log(`camera: ${event.camNumber}`);
-    console.log(`count: ${event.picCount}`);
 
     try {
       // publish to cloudwatch metrics
@@ -114,18 +112,42 @@ class MetricsLogger {
   }
 
   async handleNewImage(filePath) {
-    console.log('Extracting Exif data...');
+    // extract metadata
     const metadata = await this.getExif(filePath);
-    console.log('metadata: ', metadata);
     const camNumber = this.getCamNumber(metadata.comment);
-    // TODO: caclulate latency (lag between when image was taken and now)
-    console.log('date/time Original: ', metadata['date/timeOriginal']);
+
+    // caclulate latency (lag between when image was taken and now)
     const dto = moment(metadata['date/timeOriginal'], 'YYYY:MM:DD hh:mm:ss');
-    console.log('dto: ', dto);
     const now = moment();
     const latency = now.diff(dto, 'seconds');
-    console.log('latency: ', latency);
-    // TODO: publish to Cloudwatch
+
+    try {
+      // publish to cloudwatch metrics
+      var params = {
+        MetricData: [
+          {
+            MetricName: 'PicLatency',
+            Dimensions: [
+              {
+                Name: 'base',
+                Value: this.baseId,
+              },
+              {
+                Name: 'camera',
+                Value: 'camera ' + camNumber,
+              },
+            ],
+            Timestamp: now.unix(),
+            Unit: 'Seconds',
+            Value: picLatency,
+          },
+        ],
+        Namespace: 'Animl',
+      };
+      return await this.cloudwatch.putMetricData(params).promise();
+    } catch (e) {
+      console.log('Error pushing pic counter metric to cloudwatch: ', e);
+    }
   }
 
   stop() {
