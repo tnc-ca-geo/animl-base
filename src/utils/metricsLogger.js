@@ -1,3 +1,4 @@
+const path = require('path');
 const moment = require('moment');
 const Tail = require('tail').Tail;
 const AWS = require('aws-sdk');
@@ -93,6 +94,8 @@ class MetricsLogger {
     console.log('Extracting Exif data...');
     const exif = await this.getExif(filePath);
     console.log('exif: ', exif);
+    // TODO: caclulate time between DateTimeOriginal and now
+    // TODO: publish to Cloudwatch 
   }
 
   stop() {
