@@ -51,15 +51,19 @@ class MetricsLogger {
   }
 
   getCamNumber(comment) {
-    const fields = comment.split('.');
-    const idField = fields.find((field) => field.includes('CAMERAID'));
-    const idFieldValue = idField.split('=')[1];
-    const camera = idFieldValue.split(',')[0];
-    console.log('camera: ', camera);
-    let re = new RegExp(/\d+/);
-    const camNumber = camera.match(re)[0];
-    console.log('camNumber: ', cameraNumber);
-    return camNumber;
+    try {
+      const fields = comment.split('.');
+      const idField = fields.find((field) => field.includes('CAMERAID'));
+      const idFieldValue = idField.split('=')[1];
+      const camera = idFieldValue.split(',')[0];
+      console.log('camera: ', camera);
+      let re = new RegExp(/\d+/);
+      const camNumber = camera.match(re)[0];
+      console.log('camNumber: ', camNumber);
+      return camNumber;
+    } catch (e) {
+      console.log('Error parsing metadata for cam number: ', e);
+    }
   }
 
   parsePicCountEvent(data) {
