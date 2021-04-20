@@ -50,22 +50,34 @@ class MetricsLogger {
     });
   }
 
+  getCamNumber(comment) {
+    const fields = comment.split('.');
+    const idField = fields.find((field) => field.includes('CAMERAID'));
+    const idFieldValue = idField.split('=')[1];
+    const camera = idFieldValue.split(',')[0];
+    console.log('camera: ', camera);
+    let re = new RegExp(/\d+/);
+    const camNumber = camera.match(re)[0];
+    console.log('camNumber: ', cameraNumber);
+    return camNumber;
+  }
+
   parsePicCountEvent(data) {
     console.log('parsig pic counter event: ', data);
     let re = new RegExp(/\d+/);
     const event = data.split(':EVENT:');
     const timestamp = moment(event[0], 'YYYY/MM/DD hh:mm:ss').unix();
     const msg = event[1].split(',');
-    const camera = msg[0].match(re);
+    const camNumber = msg[0].match(re);
     const picCount = msg[1].match(re);
-    return { timestamp, camera, picCount };
+    return { timestamp, camNumber, picCount };
   }
 
   async handlePicCounterEvent(data) {
     // Parse event
     const event = this.parsePicCountEvent(data);
     console.log(`timestamp: ${event.timestamp}`);
-    console.log(`camera: ${event.camera}`);
+    console.log(`camera: ${event.camNumber}`);
     console.log(`count: ${event.picCount}`);
 
     try {
@@ -81,7 +93,7 @@ class MetricsLogger {
               },
               {
                 Name: 'camera',
-                Value: 'camera ' + event.camera,
+                Value: 'camera ' + event.camNumber,
               },
             ],
             Timestamp: event.timestamp,
@@ -101,12 +113,14 @@ class MetricsLogger {
     console.log('Extracting Exif data...');
     const metadata = await this.getExif(filePath);
     console.log('metadata: ', metadata);
+    const camNumber = this.getCamNumber(metadata.comment);
     // TODO: caclulate latency (lag between when image was taken and now)
-    // const dto = moment(metadata.exif.DateTimeOriginal, 'YYYY:MM:DD hh:mm:ss');
-    // console.log('dto: ', dto);
-    // const now = moment();
-    // const latency = now.diff(dto, 'seconds');
-    // console.log('lag: ', latency);
+    console.log('date/time Original: ', metadata['date/timeOriginal']);
+    const dto = moment(metadata['date/timeOriginal'], 'YYYY:MM:DD hh:mm:ss');
+    console.log('dto: ', dto);
+    const now = moment();
+    const latency = now.diff(dto, 'seconds');
+    console.log('latency: ', latency);
     // TODO: publish to Cloudwatch
   }
 
