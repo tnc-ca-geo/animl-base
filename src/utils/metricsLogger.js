@@ -92,10 +92,15 @@ class MetricsLogger {
 
   async handleNewImage(filePath) {
     console.log('Extracting Exif data...');
-    const exif = await this.getExif(filePath);
-    console.log('exif: ', exif);
+    const metadata = await this.getExif(filePath);
+    console.log('metadata: ', metadata);
     // TODO: caclulate time between DateTimeOriginal and now
-    // TODO: publish to Cloudwatch 
+    const dto = moment(metadata.exif.DateTimeOriginal, 'YYYY:MM:DD hh:mm:ss');
+    console.log('dto: ', dto);
+    const now = moment();
+    const lag = now.diff(dto, 'seconds');
+    console.log('lag: ', lag);
+    // TODO: publish to Cloudwatch
   }
 
   stop() {
