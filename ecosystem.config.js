@@ -9,6 +9,7 @@ module.exports = {
       max_memory_restart: '1G',
       exp_backoff_restart_delay: 100,
       time: true,
+      shutdown_with_message: true,
     },
     // {
     //   name: 'temperature-logger',

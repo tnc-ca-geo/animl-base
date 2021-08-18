@@ -7,7 +7,7 @@ const MetricsLogger = require('./utils/metricsLogger');
 const config = require('./config/index');
 
 function shutDown(params) {
-  console.log(`\nExiting Animl Base with code ${code}`);
+  console.log(`\nExiting Animl Base with code ${params.code}`);
   if (config.os === 'linux') {
     params.mbase.stop();
   }
@@ -57,11 +57,11 @@ async function start() {
     .on('add', (path) => handleNewFile(path, queue, metricsLogger))
     .on('error', (err) => console.log(`imgWatcher error: ${err}`));
 
-  // Just for testing...
-  const filesWatched = imgWatcher.getWatched();
-  Object.keys(filesWatched).forEach((dir) => {
-    console.log(`Number of files in ${dir} : ${filesWatched[dir].length}`);
-  });
+  // // Just for testing...
+  // const filesWatched = imgWatcher.getWatched();
+  // Object.keys(filesWatched).forEach((dir) => {
+  //   console.log(`Number of files in ${dir} : ${filesWatched[dir].length}`);
+  // });
 
   // Initialize worker
   let worker = new Worker(config, queue, imgWatcher);
@@ -82,6 +82,15 @@ async function start() {
 
   process.on('SIGTERM', initShutDown);
   process.on('SIGINT', initShutDown);
+  // Windows graceful shutdown
+  // NOTE: experiencing bug when console.logging here:
+  // https://github.com/Unitech/pm2/issues/4925  
+  process.on('message', function(msg) {
+    if (msg == 'shutdown') {
+      initShutDown('shutdown');
+    }
+  });
+
   
 }
 
