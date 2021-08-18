@@ -6,12 +6,14 @@ const Multibase = require('./utils/multibase');
 const MetricsLogger = require('./utils/metricsLogger');
 const config = require('./config/index');
 
-function shutDown(code, imgWatcher, metricsLogger, worker, mbase) {
+function shutDown(params) {
   console.log(`\nExiting Animl Base with code ${code}`);
-  mbase.stop();
-  worker.stop();
-  imgWatcher.close().then(() => console.log('Closed'));
-  metricsLogger.stop();
+  if (config.os === 'linux') {
+    params.mbase.stop();
+  }
+  params.worker.stop();
+  params.imgWatcher.close().then(() => console.log('Closed'));
+  params.metricsLogger.stop();
 }
 
 function validateFile(filePath) {
@@ -34,9 +36,11 @@ function handleNewFile(filePath, queue, metricsLogger) {
 async function start() {
   console.log('Starting Animl Base');
 
-  // Starting Buckeye Multibase Server
-  let mbase = new Multibase();
-  mbase.start();
+  // Starting Buckeye Multibase Server (linux only)
+  if (config.os === 'linux') {
+    let mbase = new Multibase();
+    mbase.start();
+  }
 
   // Initialize metrics logger
   let metricsLogger = new MetricsLogger(config);
@@ -65,12 +69,20 @@ async function start() {
   worker.poll();
 
   // Clean up & shut down
-  process.on('SIGTERM', (code) => {
-    shutDown(code, imgWatcher, metricsLogger, worker, mbase);
-  });
-  process.on('SIGINT', (code) => {
-    shutDown(code, imgWatcher, metricsLogger, worker, mbase);
-  });
+  const initShutDown = (code) => {
+    const params = {
+      code, 
+      imgWatcher,
+      metricsLogger,
+      worker,
+      ...(config.os === 'linux' && { mbase: mbase }),
+    }
+    shutDown(params);
+  }
+
+  process.on('SIGTERM', initShutDown);
+  process.on('SIGINT', initShutDown);
+  
 }
 
 start();

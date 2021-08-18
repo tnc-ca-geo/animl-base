@@ -10,13 +10,13 @@ module.exports = {
       exp_backoff_restart_delay: 100,
       time: true,
     },
-    {
-      name: 'temperature-logger',
-      script: 'python temp-monitor.py',
-      instances: 1,
-      autorestart: true,
-      exp_backoff_restart_delay: 100,
-      watch: false,
-    },
+    // {
+    //   name: 'temperature-logger',
+    //   script: 'python temp-monitor.py',
+    //   instances: 1,
+    //   autorestart: true,
+    //   exp_backoff_restart_delay: 100,
+    //   watch: false,
+    // },
   ],
 };

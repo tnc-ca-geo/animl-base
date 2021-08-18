@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 module.exports = {
+  os: process.env.OS,
+  baseName: process.env.BASE_NAME,
   imgDir: process.env.IMG_DIR,
   dbFile: 'db.json',
   logFile: process.env.LOG_FILE,

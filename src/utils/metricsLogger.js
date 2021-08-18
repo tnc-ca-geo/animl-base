@@ -8,7 +8,11 @@ var exif = require('exiftool');
 class MetricsLogger {
   constructor(config) {
     this.config = config;
-    this.baseId = path.basename(path.dirname(config.logFile));
+    // NOTE: this probably won't work on PC version of software 
+    // b/c the log file doesn't appear to be under a directory with the
+    // base serial number as a name
+    // TODO: make baseId an env variable?
+    // this.baseId = path.basename(path.dirname(config.logFile));
   }
 
   async init() {
@@ -91,7 +95,7 @@ class MetricsLogger {
             Dimensions: [
               {
                 Name: 'base',
-                Value: this.baseId,
+                Value: this.config.baseName,
               },
               {
                 Name: 'camera',
@@ -130,7 +134,7 @@ class MetricsLogger {
             Dimensions: [
               {
                 Name: 'base',
-                Value: this.baseId,
+                Value: this.config.baseName,
               },
               {
                 Name: 'camera',
