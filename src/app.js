@@ -36,11 +36,9 @@ function handleNewFile(filePath, queue, metricsLogger) {
 async function start() {
   console.log('Starting Animl Base');
 
-  // Starting Buckeye Multibase Server (linux only)
-  if (config.os === 'linux') {
-    let mbase = new Multibase();
+  // Starting Buckeye software
+    let mbase = new Multibase(config);
     mbase.start();
-  }
 
   // Initialize metrics logger
   let metricsLogger = new MetricsLogger(config);
@@ -69,25 +67,14 @@ async function start() {
   worker.poll();
 
   // Clean up & shut down
-  const initShutDown = (code) => {
-    const params = {
-      code, 
-      imgWatcher,
-      metricsLogger,
-      worker,
-      ...(config.os === 'linux' && { mbase: mbase }),
-    }
-    shutDown(params);
-  }
-
-  process.on('SIGTERM', initShutDown);
-  process.on('SIGINT', initShutDown);
+  process.on('SIGTERM', shutDown(code, imgWatcher, metricsLogger, worker, mbase));
+  process.on('SIGINT', shutDown(code, imgWatcher, metricsLogger, worker, mbase));
   // Windows graceful shutdown
   // NOTE: experiencing bug when console.logging here:
   // https://github.com/Unitech/pm2/issues/4925  
   process.on('message', function(msg) {
-    if (msg == 'shutdown') {
-      initShutDown('shutdown');
+    if (msg != 'shutdown') {
+      shutDown(msg, imgWatcher, metricsLogger, worker, mbase);
     }
   });
 

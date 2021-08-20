@@ -3,8 +3,16 @@ const dotenv = require('dotenv');
 // assign it to process.env.
 dotenv.config();
 
+let os 
+if (process.env.OS.toLowerCase().includes('linux')) {
+  os = 'linux';
+}
+else if (process.env.OS.toLowerCase().includes('windows')) {
+  os = 'windows';
+}
+
 module.exports = {
-  os: process.env.OS,
+  os: os,
   baseName: process.env.BASE_NAME,
   imgDir: process.env.IMG_DIR,
   dbFile: 'db.json',

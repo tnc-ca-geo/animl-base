@@ -1,8 +1,13 @@
 const { spawn } = require('child_process');
 
 class Multibase {
-  exec(args) {
-    const mbase = spawn('mbasectl', args, { shell: true });
+  constructor(config) {
+    this.config = config;
+  }
+
+  exec(cmd, args) {
+    const opts = { shell: true };
+    const mbase = args ? spawn(cmd, args, opts) : spawn(cmd, opts);
     mbase.stdout.on('data', (data) => {
       console.log('mbase stdout: ', data.toString());
     });
@@ -15,11 +20,22 @@ class Multibase {
   }
 
   start() {
-    this.exec(['-s']);
+    if (this.config.os === 'linux') {
+      console.log('Linux detected, starting Buckeye Multibase SE')
+      this.exec('mbasectl', ['-s']);
+    }
+    else if (this.config.os === 'windows') {
+      console.log('Windows detected, starting Buckeye X-Manager')
+      this.exec('C:\\BuckEyeCam\\"X7D Base"\\xbase.exe');
+    }
   }
 
   stop() {
-    this.exec(['-k']);
+    // X-manager (the Windows version of the Buckeye network software)
+    // does not have a CLI
+    if (this.config.os === 'linux') {
+      this.exec('mbasectl', ['-k']);
+    }
   }
 }
 

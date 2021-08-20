@@ -269,16 +269,21 @@ $ npm install
 3. Add a .env file to the project's root directory with the following items. Note, AWS creds can be found in the [SCI Cameratrap network passwords document](https://tnc.app.box.com/file/762650708780). For access, contact nathaniel.rindlaub@tnc.org: 
 
 ```
+# Base name (no spaces)
+BASE_NAME = valley-peak
+
 # AWS
-AWS_ACCESS_KEY_ID = [REPLACE WITH KEY ID]
-AWS_SECRET_ACCESS_KEY = [REPLACE WITH KEY]
+AWS_ACCESS_KEY_ID = [access key ID]
+AWS_SECRET_ACCESS_KEY = [secret access key]
 AWS_REGION = us-west-1
 
 # Image directory to watch
 IMG_DIR = '/home/animl/data/<base name>/cameras/'
+# IMG_DIR = "c:\BuckEyeCam\X7D Base\pictures\" # Windows
 
 # Log file to watch
 LOG_FILE = '/home/animl/data/<base name>/log.txt'
+# LOG_FILE = "c:\BuckEyeCam\X7D Base\log.txt" # windows
 
 # S3 
 DEST_BUCKET = animl-data-staging
