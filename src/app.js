@@ -7,7 +7,7 @@ const MetricsLogger = require('./utils/metricsLogger');
 const config = require('./config/index');
 
 function shutDown(params) {
-  console.log(`\nExiting Animl Base with code ${params.code}`);
+  console.log(`\nExiting Animl Base with params: ${JSON.stringify(params)}`);
   if (config.platform === 'linux') {
     params.mbase.stop();
   }
@@ -67,8 +67,8 @@ async function start() {
   worker.poll();
 
   // Clean up & shut down
-  process.on('SIGTERM', shutDown(code, imgWatcher, metricsLogger, worker, mbase));
-  process.on('SIGINT', shutDown(code, imgWatcher, metricsLogger, worker, mbase));
+  process.on('SIGTERM', shutDown(imgWatcher, metricsLogger, worker, mbase));
+  process.on('SIGINT', shutDown(imgWatcher, metricsLogger, worker, mbase));
   // Windows graceful shutdown
   // NOTE: experiencing bug when console.logging here:
   // https://github.com/Unitech/pm2/issues/4925  
