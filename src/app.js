@@ -8,7 +8,7 @@ const config = require('./config/index');
 
 function shutDown(params) {
   console.log(`\nExiting Animl Base with code ${params.code}`);
-  if (config.os === 'linux') {
+  if (config.platform === 'linux') {
     params.mbase.stop();
   }
   params.worker.stop();

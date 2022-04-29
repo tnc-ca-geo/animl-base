@@ -20,11 +20,11 @@ class Multibase {
   }
 
   start() {
-    if (this.config.os === 'linux') {
+    if (this.config.platform === 'linux') {
       console.log('Linux detected, starting Buckeye Multibase SE')
       this.exec('mbasectl', ['-s']);
     }
-    else if (this.config.os === 'windows') {
+    else if (this.config.platform === 'win32') {
       console.log('Windows detected, starting Buckeye X-Manager')
       this.exec('C:\\BuckEyeCam\\"X7D Base"\\xbase.exe');
     }
@@ -33,7 +33,7 @@ class Multibase {
   stop() {
     // X-manager (the Windows version of the Buckeye network software)
     // does not have a CLI
-    if (this.config.os === 'linux') {
+    if (this.config.platform === 'linux') {
       this.exec('mbasectl', ['-k']);
     }
   }
