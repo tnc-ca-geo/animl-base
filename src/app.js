@@ -7,7 +7,7 @@ const MetricsLogger = require('./utils/metricsLogger');
 const config = require('./config/index');
 
 function shutDown(params) {
-  console.log(`\nExiting Animl Base with params: ${JSON.stringify(params)}`);
+  console.log(`\nExiting Animl Base`);
   if (config.platform === 'linux') {
     params.mbase.stop();
   }
