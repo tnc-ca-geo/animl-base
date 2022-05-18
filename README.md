@@ -1,12 +1,12 @@
 # Animl Base
-Animl Base is a node application deployed on Rasberry Pi that ingests new images 
-from a Buckeye wireless camera trap base station and uploads them to S3.
+Animl Base is a node application deployed on linux-based field computers that ingests new images from a Buckeye wireless camera trap base station and uploads them to S3.
 
-> NOTE: Login credentials for the Santa Cruz Island camera trap systems can be found [here](https://tnc.app.box.com/file/762650708780). To request access, please contact nathaniel.rindlaub@tnc.org
+> NOTE: Login credentials for TNC camera trap systems can be found [here](https://tnc.app.box.com/file/762650708780). To request access, please contact nathaniel.rindlaub@tnc.org
 
 ## Table of Contents
 - [Related repos](#related-repos)
-- [Raspberry Pi setup](#rasberry-pi-setup)
+- [Hardware](#hardware)
+- [Setup](#setup)
 - [Managment](#Managment)
 
 ## Related repos
@@ -17,18 +17,24 @@ from a Buckeye wireless camera trap base station and uploads them to S3.
 - Animl ML resources      http://github.com/tnc-ca-geo/animl-ml
 - Animl desktop app       https://github.com/tnc-ca-geo/animl-desktop
 
+## Hardware
+### Buckeye X80 PC Base Reciever
+The [Buckeye X80 PC Base Receiver](https://store.buckeyecam.com/wireless-receivers/x80-pc-base-receiver.html) demodulates analogue RF transmissions and converts them into digital images, which get ported over to a connected computer via USB and stored on the filesystem. 
 
-## Rasberry Pi setup
-The current hardware includes: 
-- [Raspberry Pi 4B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/), though RPi 3B is reccomended if running off solar
-- [Sixfab Power Managment and UPS HAT](https://sixfab.com/power/) and [battery](https://www.18650batterystore.com/products/panasonic-ncr18650b)
-- [Buckeye X80 PC Base Receiver](https://store.buckeyecam.com/wireless-receivers/x80-pc-base-receiver.html)
-- [PoE Injector](https://www.amazon.com/gp/product/B00BK4W8TQ/ref=ppx_yo_dt_b_asin_title_o06_s01?ie=UTF8&psc=1)
-- [PoE Splitter](https://www.amazon.com/gp/product/B07CNKX14C/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1)
-- [micro SD card](https://www.amazon.com/gp/product/9875981818/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
-- [USB flash drive (250GB)](https://www.amazon.com/gp/product/B07857Y17V/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
+### Computer
+We have tested and used a variety of headless field computers, and set up instructions varies slightly depending on which you're using. Thus far we've used:
+- [Raspberry Pi 4B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/) (or 3B, if running off solar). Reccomended peripherals include:
+        - [Sixfab Power Managment and UPS HAT](https://sixfab.com/power/)
+        - [PoE Injector](https://www.amazon.com/gp/product/B00BK4W8TQ/ref=ppx_yo_dt_b_asin_title_o06_s01?ie=UTF8&psc=1)
+        - [PoE Splitter](https://www.amazon.com/gp/product/B07CNKX14C/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1)
+        - [micro SD card](https://www.amazon.com/gp/product/9875981818/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
+        - [USB flash drive (250GB)](https://www.amazon.com/gp/product/B07857Y17V/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
+- [OnLogic ML-100G-51](https://www.onlogic.com/ml100g-51/) w/ Ubuntu Desktop 20.04. Reccomended peripherals include:
+        - [Dummy HDMI plug](https://www.amazon.com/dp/B06XT1Z9TF?psc=1&ref=ppx_yo2ov_dt_b_product_details) to fix [AnyDesk issue]([url](https://support.anydesk.com/knowledge/i-only-see-a-black-screen-or-waiting-for-image)) when accessing headless computers.
+- [Cincoze DA-1000](https://www.onlogic.com/da-1000/#) w/ Ubuntu Desktop 20.04 Reccomended peripherals include:
+        - [Dummy DVI plug](https://www.amazon.com/dp/B0746HRZ3J?psc=1&ref=ppx_yo2ov_dt_b_product_details) to fix [AnyDesk issue]([url](https://support.anydesk.com/knowledge/i-only-see-a-black-screen-or-waiting-for-image)) when accessing headless computers.
 
-### Set up Pi
+## Setup
 
 #### Step 1 - Assemble Sixfab Power Managment and UPS HAT
 The Power Managment and UPS HAT solves a bunch of problems we encountered in our initial test deployment on SCI at once:
