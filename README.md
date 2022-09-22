@@ -332,6 +332,19 @@ This will save the current state of PM2 (with Animl Base and Mulitbase
 running) in a dump file that will be used when they system starts or when 
 resurrecting PM2.
 
+If you need make updates to animl-base after it's already been 
+running/daemonized (especially updates that affect 
+the `ecosystem.config.js` file), you'll want to pull down those changes and 
+run the following to clear the cached processes:
+
+```shell
+$ pm2 unstartup systemd
+$ pm2 delete all
+```
+
+Following that, startup and re-save the process as you did before by followin 
+the steps above starting with `npm run start-daemon`.
+
 
 ## Managment
 
