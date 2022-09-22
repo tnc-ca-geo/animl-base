@@ -8,11 +8,6 @@ var exif = require('exiftool');
 class MetricsLogger {
   constructor(config) {
     this.config = config;
-    // NOTE: this probably won't work on PC version of software 
-    // b/c the log file doesn't appear to be under a directory with the
-    // base serial number as a name
-    // TODO: make baseId an env variable?
-    // this.baseId = path.basename(path.dirname(config.logFile));
   }
 
   async init() {
@@ -57,13 +52,9 @@ class MetricsLogger {
   getCamNumber(comment) {
     try {
       const fields = comment.split('.');
-      const idField = fields.find((field) => field.includes('CAMERAID'));
-      // TODO: Bug here? I'm getting "Cannot read property split of undefined"
-      const idFieldValue = idField.split('=')[1];
-      const camera = idFieldValue.split(',')[0];
-      let re = new RegExp(/\d+/);
-      const camNumber = camera.match(re)[0];
-      return camNumber;
+      const nodeNumField = fields.find((field) => field.includes('NODE'));
+      const nodeNum = nodeNumField.split('=')[1];
+      return nodeNum;
     } catch (e) {
       console.log('Error parsing metadata for cam number: ', e);
     }
@@ -92,7 +83,7 @@ class MetricsLogger {
       var params = {
         MetricData: [
           {
-            MetricName: 'PicCount', // rename PicCountOnCamera
+            MetricName: 'PicCountOnCamera',
             Dimensions: [
               {
                 Name: 'base',
