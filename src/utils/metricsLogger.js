@@ -147,7 +147,6 @@ class MetricsLogger {
   }
 
   stop() {
-    console.log('Stopping metricsLogger');
     if (this.tail) {
       this.tail.unwatch();
     }

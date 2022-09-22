@@ -57,13 +57,13 @@ class Multibase {
   async stop() {
     // X-manager (the Windows version of the Buckeye network software)
     // does not have a CLI
-    console.log('Stopping Multibase SE');
     if (this.config.platform === 'linux') {
       const running = await this.isRunning();
       if (running) {
+        console.log('Stopping Multibase SE');
         await this.exec('mbasectl', ['-k']);
+        console.log('Multibase SE stopped');
       }
-      console.log('Multibase SE stopped');
     }
   }
 }

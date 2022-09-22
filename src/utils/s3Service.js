@@ -20,6 +20,8 @@ class S3Service {
       let fileStream = fs.createReadStream(filePath);
       fileStream.on('error', (err) => console.log('File stream error: ', err));
 
+      // NOTE: we MUST set content type when uploading to S3. See:
+      // https://github.com/tnc-ca-geo/animl-api/issues/65
       let params = {
         Bucket: this.config.bucket,
         Body: fileStream,
