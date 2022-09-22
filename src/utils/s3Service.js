@@ -24,6 +24,7 @@ class S3Service {
         Bucket: this.config.bucket,
         Body: fileStream,
         Key: fileName,
+        ContentType: 'image/jpeg',
       };
 
       return this.s3.upload(params).promise();
