@@ -1,4 +1,4 @@
-const nodemon = require("nodemon");
+const nodemon = require('nodemon');
 
 module.exports = {
   apps: [
@@ -12,6 +12,7 @@ module.exports = {
       exp_backoff_restart_delay: 100,
       time: true,
       shutdown_with_message: true,
+      kill_timeout: 5000,
     },
     // {
     //   name: 'temperature-logger',
