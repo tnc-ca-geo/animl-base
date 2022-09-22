@@ -1,12 +1,12 @@
 # Animl Base
-Animl Base is a node application deployed on Rasberry Pi that ingests new images 
-from a Buckeye wireless camera trap base station and uploads them to S3.
+Animl Base is a node application deployed on linux-based field computers that ingests new images from a Buckeye wireless camera trap base station and uploads them to S3.
 
-> NOTE: Login credentials for the Santa Cruz Island camera trap systems can be found [here](https://tnc.app.box.com/file/762650708780). To request access, please contact nathaniel.rindlaub@tnc.org
+> NOTE: Login credentials for TNC camera trap systems can be found [here](https://tnc.app.box.com/file/762650708780). To request access, please contact nathaniel.rindlaub@tnc.org
 
 ## Table of Contents
 - [Related repos](#related-repos)
-- [Raspberry Pi setup](#rasberry-pi-setup)
+- [Hardware](#hardware)
+- [Setup](#setup)
 - [Managment](#Managment)
 
 ## Related repos
@@ -17,20 +17,28 @@ from a Buckeye wireless camera trap base station and uploads them to S3.
 - Animl ML resources      http://github.com/tnc-ca-geo/animl-ml
 - Animl desktop app       https://github.com/tnc-ca-geo/animl-desktop
 
+## Hardware
+### Buckeye X80 PC Base Reciever
+The [Buckeye X80 PC Base Receiver](https://store.buckeyecam.com/wireless-receivers/x80-pc-base-receiver.html) demodulates analogue RF transmissions and converts them into digital images, which get ported over to a connected computer via USB and stored on the filesystem. 
 
-## Rasberry Pi setup
-The current hardware includes: 
-- [Raspberry Pi 4B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/), though RPi 3B is reccomended if running off solar
-- [Sixfab Power Managment and UPS HAT](https://sixfab.com/power/) and [battery](https://www.18650batterystore.com/products/panasonic-ncr18650b)
-- [Buckeye X80 PC Base Receiver](https://store.buckeyecam.com/wireless-receivers/x80-pc-base-receiver.html)
-- [PoE Injector](https://www.amazon.com/gp/product/B00BK4W8TQ/ref=ppx_yo_dt_b_asin_title_o06_s01?ie=UTF8&psc=1)
-- [PoE Splitter](https://www.amazon.com/gp/product/B07CNKX14C/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1)
-- [micro SD card](https://www.amazon.com/gp/product/9875981818/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
-- [USB flash drive (250GB)](https://www.amazon.com/gp/product/B07857Y17V/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
+### Computer
+We have tested and used a variety of headless field computers, and set up instructions vary slightly depending on which you're using. Thus far we've used:
+- [Raspberry Pi 4B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/) (or 3B, if running off solar). Reccomended peripherals include:
+    - [Sixfab Power Managment and UPS HAT](https://sixfab.com/power/)
+    - [PoE Injector](https://www.amazon.com/gp/product/B00BK4W8TQ/ref=ppx_yo_dt_b_asin_title_o06_s01?ie=UTF8&psc=1)
+    - [PoE Splitter](https://www.amazon.com/gp/product/B07CNKX14C/ref=ppx_yo_dt_b_asin_title_o00_s00?ie=UTF8&psc=1)
+    - [micro SD card](https://www.amazon.com/gp/product/9875981818/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
+    - [USB flash drive (250GB)](https://www.amazon.com/gp/product/B07857Y17V/ref=ppx_yo_dt_b_asin_title_o05_s00?ie=UTF8&psc=1)
+- [OnLogic ML-100G-51](https://www.onlogic.com/ml100g-51/) w/ Ubuntu Desktop 20.04. Reccomended peripherals include:
+    - [Dummy HDMI plug](https://www.amazon.com/dp/B06XT1Z9TF?psc=1&ref=ppx_yo2ov_dt_b_product_details) to fix [AnyDesk issue]([url](https://support.anydesk.com/knowledge/i-only-see-a-black-screen-or-waiting-for-image)) when accessing headless computers.
+- [Cincoze DA-1000](https://www.onlogic.com/da-1000/#) w/ Ubuntu Desktop 20.04 Reccomended peripherals include:
+    - [Dummy DVI plug](https://www.amazon.com/dp/B0746HRZ3J?psc=1&ref=ppx_yo2ov_dt_b_product_details) to fix [AnyDesk issue]([url](https://support.anydesk.com/knowledge/i-only-see-a-black-screen-or-waiting-for-image)) when accessing headless computers.
 
-### Set up Pi
+## Setup
 
-#### Step 1 - Assemble Sixfab Power Managment and UPS HAT
+### Prep for Raspberry Pi only (can skip if not using RPi):
+
+#### Assemble Sixfab Power Managment and UPS HAT
 The Power Managment and UPS HAT solves a bunch of problems we encountered in our initial test deployment on SCI at once:
 - its battery serves as a UPS, which should guard against temporary power outages at Valley Peak and buffer any power lags we may be experiencing due to the long cat6 we're using to draw POE
 - it provides safe-shutdown configurations, so that if the battery % falls below a certain threshhold it will shut down the Pi safely
@@ -40,8 +48,13 @@ The Power Managment and UPS HAT solves a bunch of problems we encountered in our
 
 Refer to the Sixfab [documentation](https://docs.sixfab.com/docs/raspberry-pi-power-management-ups-hat-introduction) for assembly instructions. Note, if you haven't already configured the Pi (step 2 below), you will need to hold off on setting up the Sixfab power software until the Pi is up and running.
 
-#### Step 2 - Set up Pi to boot from the USB flash drive:
+#### Set up Sixfab Power software
+Instructions can be found towards the bottom of the page [here](https://docs.sixfab.com/docs/sixfab-power-getting-started). A few configurations to set:
+- A scheduled event to reboot the device (via Hardware) once a day
+- Set battery design capacity to ```3400```
+- Enable watchdog
 
+#### Set up Pi to boot from the USB flash drive:
 1. Good instructions on how to burn the Raspberry Pi OS to a flash drive and 
 configure the RPi to boot from it: 
 [RPi 3 instructions](https://pimylifeup.com/raspberry-pi-boot-from-usb/), [RPi 4 instructions](https://www.tomshardware.com/how-to/boot-raspberry-pi-4-usb). You'll need an SD card temporarily but won't need it once the RPi has been configured.
@@ -75,7 +88,7 @@ After rebooting, you can confirm that swap size was inceased with the command:
 $ swapon
 ```
 
-#### Step 3 - Create new user called "animl"
+### Create new Linux user called "animl"
 The "animl" user will be the primary owner/user of all application files, 
 directories, and processes going forward. Create it, give it the same 
 permissions as the pi user, and switch user:
@@ -85,44 +98,34 @@ $ sudo usermod -a -G adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,netd
 $ echo 'animl ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010_animl-nopasswd
 $ su - animl
 ```
-Modify the lightdm.conf file to make 'animl' the user that gets logged in 
-automatically upon booting up. 
 
-```
-$ sudo nano /etc/lightdm/lightdm.conf
-```
-and replace 'pi' in the following line with 'animl':
-```
-autologin-user=pi
-```
-
-
-### Update network settings
-#### Change the pi's hostname
-This step is not necessary but may be helpful to better distinguish the pi on 
-the network. To change the Pi's default hostname from "raspberrypi" to 
-"animl-base", first update the `/etc/hosts` file:
+### Change the hostname
+This step is not necessary but may be helpful to better distinguish the computer on 
+the network. To change the computer's default hostname, first update the `/etc/hosts` file:
 ```
 $ sudo nano /etc/hosts
 ```
-replace "raspberrypi" with "animl-base" in the last line of the file and save. 
+replace "raspberrypi" (or whatever the default is) with "animl-base-[network-name]" in the last line of the file and save. 
 Then open `/etc/hostname`:
 ```
 $ sudo nano /etc/hostname
 ```
-And replace "raspberrypi" with "animl-base".
+And replace the default hostname with the same hostname you added to `/etc/hosts`.
 
-#### Double check that avahi-daemon is installed and running
-One of the easiest ways to connect remotely to your Pi and identify it on a 
+### Make sure computer is set to automatically power-on in BIOS settings
+This process will differ depending on the computer.
+
+### Double check that avahi-daemon is installed and running
+One of the easiest ways to connect remotely to your field computers and identify it on a 
 local network is with mDNS (good explainer on that 
 [here](https://www.howtogeek.com/167190/how-and-why-to-assign-the-.local-domain-to-your-raspberry-pi/)).
 If you have Avahi installed and running on the Pi as described in that article, 
 all  you need to do to SSH into your pi from within your local network is run 
-`ssh [USER]@[HOSTNAME].local`. So in our case the SSH command would look like:
+`ssh [USER]@[HOSTNAME].local`. So in our case the SSH command would look something like:
 ```
 $ ssh animl@animl-base.local
 ```
-This saves you from having to search for or remember the IP address of the Pi. 
+This saves you from having to search for or remember the IP address of the field computer. 
 Avahi This may have already been installed with the OS. To check, run:
 ```
 $ avahi-daemon -V
@@ -134,32 +137,17 @@ discoverable via  `[USER]@[HOSTNAME].local`:
 $ sudo apt-get install avahi-daemon
 ```
 
-#### Set up static IP address
-To make sure that the IP address doesn't change when it get's 
-disconnected/connected to the network (as is the case with DHCP IP assignments), 
-you can modify the Raspberry Pi’s DHCP client daemon 
-(instructions [here](https://pimylifeup.com/raspberry-pi-static-ip-address/)).
+### Download AnyDesk
+We use AnyDesk for remote-desktoping into the field computers. You can download it [here](https://anydesk.com/en/downloads). Once you have it downloaded and installed, make note of your AnyDesk Address/ID, and be sure to set a password to allow for unattended access.
 
-It's also worth mapping the fixed IP address to the device's MAC address in 
-your router configuration, so another devices can't take it when the Pi isn't 
-connected.
+> NOTE: Some Ubuntu computers don't ship with Ubuntu's Software Installer application, but you can install the .deb file by running `sudo dpkg -i <the_file.deb>`. If it responds by saying you are missing a dependency, try running `sudo apt update` then `sudo apt --fix-broken-install` then `sudo apt -y upgrade`
 
-#### Download AnyDesk
-We use AnyDesk for remoting into the Pi when it's in the field. You can 
-download it [here](https://anydesk.com/en/downloads/raspberry-pi). Once you 
-have it downloaded and installed, make note of your AnyDesk Address, and be 
-sure to set a password to allow for unattended access.
+If using Ubuntu Desktop, following installation, be sure to disable Wayland: in ```/etc/gdm3/custom.conf```, uncomment the ```WaylandEnable=false``` line. This is important so that you can log in/out of Ubuntu user accounts while maintaining an AnyDesk connection.
 
-NOTE: If you're using an RPi 4b, you may need to trick the Pi into thinking there is a monitor attached in order for Anydesk to work. To do so, make sure the ```hdmi_force_hotplug=1``` setting in the ```/boot/config.txt``` file is ***uncommented***:
-```shell
-sudo nano /boot/config.txt
-```
+> NOTE: You may also need to trick the computer into thinking there is a monitor attached in order for Anydesk to work. If you're using an RPi, make sure the ```hdmi_force_hotplug=1``` setting in the ```/boot/config.txt``` file is ***uncommented***. If you're using a computer using Ubuntu Desktop, you may need to purchase a dummy [DVI](https://www.amazon.com/dp/B0746HRZ3J?psc=1&ref=ppx_yo2ov_dt_b_product_details) or [HDMI](https://www.amazon.com/dp/B06XT1Z9TF?psc=1&ref=ppx_yo2ov_dt_b_product_details) plug to emulate a monitor and allow remote access via AnyDesk.
 
-### Set up Sixfab Power software
-Instructions can be found towards the bottom of the page [here](https://docs.sixfab.com/docs/sixfab-power-getting-started). A few configurations to set:
-- A scheduled event to reboot the device (via Hardware) once a day
-- Set battery design capacity to ```3400```
-- Enable watchdog
+### Enable SSH
+For Raspberry Pi's running Raspbian OS, this can be done from the configuration/preferences menu. For Ubuntu, you'll need to download and install [openssh-server](https://linuxize.com/post/how-to-enable-ssh-on-ubuntu-20-04/).
 
 ### Set up Buckeye server software (Multibase Server Edition) and register new base
 1. Create new directory for the camera trap data
@@ -167,7 +155,7 @@ Instructions can be found towards the bottom of the page [here](https://docs.six
 $ mkdir /home/animl/data
 ```
 
-2. Download the Mbase [tarball](https://www.buckeyecam.com/main/Files/mbse-armv7hl.tbz)
+2. Download the appropriate MulitBase SE version for your computer [here](https://www.buckeyecameras.com/downloads.html)
 and unzip using 
 ```shell
 $ sudo tar -xjf /path/to/FILENAME.tbz
@@ -225,9 +213,9 @@ Copy the following line to the bottom of the file and save:
 ```
 PATH="/usr/local/mbse:$PATH"
 ```
-You may need to close out of that shell and start a new one, restart the Pi, or switch users to the ```pi``` user and back to ```animl``` before the PATH will be updated.
+You may need to close out of that shell and start a new one or restart the computer before the PATH will be updated.
 
-6. Add your new base. Plug in the base to the RPi, then start up the the Multibase SE app from the terminal with:
+6. Add your new base. Plug the X80 PC Base Reciever into the computer, then start up the the Multibase SE app from the terminal with:
 ```shell
 $ mbasectl -s
 ```
@@ -237,8 +225,7 @@ $ mbasectl -k
 ```
 
 ### Install Animl Base and dependencies
-1. Enable SSH and VNC from the Raspberry Pi configuration menu, and download 
-some additional global dependencies (node, vim, git, awscli, exiftool, pm2):
+1. Download some additional global dependencies (node, vim, git, awscli, exiftool, pm2):
 
 ```shell
 $ sudo apt update
@@ -266,16 +253,16 @@ $ cd animl-base
 $ npm install
 ```
 
-3. Add a .env file to the project's root directory with the following items. Note, AWS creds can be found in the [SCI Cameratrap network passwords document](https://tnc.app.box.com/file/762650708780). For access, contact nathaniel.rindlaub@tnc.org: 
+3. Add a .env file to the project's root directory with the following items. Note, AWS creds can be found in the [TNC Cameratrap network passwords document](https://tnc.app.box.com/file/762650708780). For access, contact nathaniel.rindlaub@tnc.org: 
 
 ```
 # Base name (no spaces)
-BASE_NAME = valley-peak
+BASE_NAME = [network name]
 
 # AWS
 AWS_ACCESS_KEY_ID = [access key ID]
 AWS_SECRET_ACCESS_KEY = [secret access key]
-AWS_REGION = us-west-1
+AWS_REGION = us-west-2
 
 # Image directory to watch
 IMG_DIR = '/home/animl/data/<base name>/cameras/'
@@ -286,7 +273,7 @@ LOG_FILE = '/home/animl/data/<base name>/log.txt'
 # LOG_FILE = "c:\BuckEyeCam\X7D Base\log.txt" # windows
 
 # S3 
-DEST_BUCKET = animl-data-staging
+DEST_BUCKET = animl-images-ingestion-prod
 ```
 
 4. To configure logrotate to rotate all logs from animl-base and the temerature 
@@ -316,12 +303,7 @@ You can then test the configuration with:
 $ sudo logrotate /etc/logrotate.conf --debug
 ```
 
-5. Lastly, increase the the maximum number of files the RPi can watch. This 
-is a good idea because the Animl Base app watches for changes to the directories 
-that Multibase SE adds image files to, so as the number of images stored on the RPi 
-grows, you begin to exhaust the default number (8,192) of files the system can watch.
-
-To increase it, perform the steps described [here](https://klequis.io/error-enospc-system-limit-for-number-of-file-watchers-reached/)
+5. Lastly, increase the the maximum number of files the computer can watch. This is a good idea because the Animl Base app watches for changes to the directories that Multibase SE adds image files to, so as the number of images stored on the computer grows, you begin to exhaust the default number (8,192) of files the system can watch. To increase it, perform the steps described [here](https://klequis.io/error-enospc-system-limit-for-number-of-file-watchers-reached/)
 
 
 ### Start Multibase Server and Animl Base and temp-monitor.py as daemons
@@ -372,46 +354,23 @@ or Multibase Server:
 $ mbasectl -i
 ```
 
-### Sixfab power managment web app
+### Local webapp for managing Buckeye cams
+For adding new cameras, repeaters, and managing deployed devices, use the Multibase Server edition local web application, which can be found at `localhost:8888` from within the computer when Mulibase is running. You can remotely access it by remote-desktoping into the computer via AnyDesk/VCN and launchubg the local web app in a browser window if you're trying to manage the devices remotely. More detailed documentation on using the Buckeye MultiBase SE application can be found [here](https://tnc.app.box.com/file/794348600237?s=3x3e0onul82mxawahpo3qeffmzomm4uq).
+
+> NOTE: If you are having trouble adding a camera to the Base, from the Base home user interface (the page you get to after loging in and 
+clicking the "admin" button under the base entry), try "restoring the network" (hamburger menu -> Restore Network). This will search for and locate any devices that were have already been registered to the base.
+
+### Sixfab power managment web app (Raspberry Pi only)
 For remotely monitoring the RPi's status and configuring power, connectivity, and temperature alerts, you can access [https://power.sixfab.com](https://power.sixfab.com) from any computer. Credentials are in the Camera trap network [password document](https://tnc.app.box.com/file/762650708780).
 
-### Use VNC as remote desktop
-Good instructions for VNC set up and access 
-[here](https://www.raspberrypi.org/documentation/remote-access/vnc/)
+### SSH
+To remotely login to the computers via SSH, the computers's SSH needs to be enabled (see setup step above).
 
-### Use AnyDesk as remote desktop
-[Download](https://anydesk.com/en/downloads/raspberry-pi) any desk on the pi 
-then run 
-
-```shell
-$ sudo apt install <path-to-anydesk.deb file>
+If you're connected to the same local network as the computer and avahi-daemon is running (as described above), simpley run:
 ```
-
-### Local webapp for managing Buckeye cams
-For adding new cameras, repeaters, and managing deployed devices, use the Multibase Server edition local web application for, which can be found at `localhost:8888` from within the Pi when Mulibase is running. You can also remote-desktop into the Pi via AnyDesk/VCN and launch the local web app in a browser window if you're trying to manage the devices remotely.
-
-NOTE: If you are having trouble adding a camera to the Base, from the 
-Base home user interface (the page you get to after loging in and 
-clicking the "admin" button under the base entry), 
-try "restoring the network" (hamburger menu -> Restore Network). 
-This will search for and locate any devices that were have 
-already been registered to the base.
-
-### SSH into Pi
-To remotely login to the Pi via SSH, the Pi's SSH needs to be enabled from 
-the Raspberry Pi configuration menu (hopefully this was done at setup).
-
-If avahi-daemon is running (as described 
-[above](https://github.com/tnc-ca-geo/animl-base/blob/master/README.md#double-check-that-avahi-daemon-is-installed-and-running), 
-SSHing into the pi is as simple as:
-
-```shell
-$ ssh animl@animl-base.local
+$ ssh animl@[hostname].local
 ```
-
-If not, you need to find the Pi's IP address on the network, which I've found is 
-simple if the Pi is connected to a screen and you can use the terminal. Just 
-run either of the following commands:
+If not, you'll need to find the computer's IP address on the network, which I've found is simple if the Pi is connected to a screen and you can use the terminal. Just run either of the following commands:
 ```shell
 $ hostname -I
 ```
@@ -419,11 +378,7 @@ $ hostname -I
 $ ifconfig
 ```
 
-However, if you don't have direct access to the Pi and are trying to scan a 
-network for it, `arp -a` or 
-[nmap](https://www.theurbanpenguin.com/find-my-raspberry-pi-using-nmap/) might 
-be helpful. Other approaches to try can be found 
-[here](https://www.raspberrypi.org/documentation/remote-access/ip-address.md).
+However, if you don't have direct access to the Pi and are trying to scan a network for it, `arp -a` or [nmap](https://www.theurbanpenguin.com/find-my-raspberry-pi-using-nmap/) might be helpful. Other approaches to try can be found [here](https://www.raspberrypi.org/documentation/remote-access/ip-address.md).
 
 Once you have the Pi's IP address, you can SSH into it with 
 `ssh [USER]@[IP ADDRESS]`, e.g.:
@@ -432,12 +387,7 @@ $ ssh animl@192.168.0.227
 ```
 
 ### Pulling down Animl Base updates from github and restarting remotely
-SSH into the PI
-```shell
-$ ssh animl@animl-base.local
-```
-
-navigate to `~/animl-base/animl-base`, stop PM2, pull down the changes, and restart PM2:
+SSH or remote into the computer, navigate to `~/animl-base/animl-base`, stop PM2, pull down the changes, and restart PM2:
 ```shell
 $ pm2 stop all
 $ git pull
