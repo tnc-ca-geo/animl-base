@@ -59,6 +59,7 @@ class Worker {
     if (this.timer) {
       clearTimeout(this.timer);
     }
+    console.log('Worker stopped');
   }
 }
 

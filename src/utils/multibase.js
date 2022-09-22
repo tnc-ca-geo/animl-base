@@ -6,34 +6,43 @@ class Multibase {
   }
 
   exec(cmd, args) {
-    const opts = { shell: true };
-    const mbase = args ? spawn(cmd, args, opts) : spawn(cmd, opts);
-    mbase.stdout.on('data', (data) => {
-      console.log('mbase stdout: ', data.toString());
-    });
-    mbase.stderr.on('data', (data) => {
-      console.error('mbase stderr: ', data.toString());
-    });
-    mbase.on('exit', (code) => {
-      console.log(`mbase exited with code ${code}`);
+    return new Promise((resolve, reject) => {
+      const opts = { shell: true };
+      const mbase = args ? spawn(cmd, args, opts) : spawn(cmd, opts);
+      mbase.stdout.on('data', (data) => {
+        console.log('mbase stdout: ', data.toString());
+      });
+      mbase.stderr.on('data', (data) => {
+        console.error('mbase stderr: ', data.toString());
+      });
+      mbase.on('exit', (code) => {
+        console.log(`mbase exited with code ${code}`);
+        if (code === 0) {
+          resolve();
+        } else {
+          reject();
+        }
+      });
     });
   }
 
-  start() {
+  async start() {
     if (this.config.platform === 'linux') {
       console.log('Linux detected, starting Buckeye Multibase SE');
-      this.exec('mbasectl', ['-s']);
+      await this.exec('mbasectl', ['-s']);
     } else if (this.config.platform === 'win32') {
       console.log('Windows detected, starting Buckeye X-Manager');
-      this.exec('C:\\BuckEyeCam\\"X7D Base"\\xbase.exe');
+      await this.exec('C:\\BuckEyeCam\\"X7D Base"\\xbase.exe');
     }
   }
 
-  stop() {
+  async stop() {
     // X-manager (the Windows version of the Buckeye network software)
     // does not have a CLI
+    console.log('Stopping Multibase SE');
     if (this.config.platform === 'linux') {
-      this.exec('mbasectl', ['-k']);
+      await this.exec('mbasectl', ['-k']);
+      console.log('Multibase SE stopped');
     }
   }
 }

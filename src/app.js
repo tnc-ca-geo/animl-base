@@ -6,14 +6,15 @@ const Multibase = require('./utils/multibase');
 const MetricsLogger = require('./utils/metricsLogger');
 const config = require('./config/index');
 
-function shutDown(imgWatcher, metricsLogger, worker, mbase) {
+async function shutDown(imgWatcher, metricsLogger, worker, mbase) {
   try {
     console.log(`Exiting Animl Base`);
     if (config.platform === 'linux') {
-      mbase.stop();
+      await mbase.stop();
     }
     worker.stop();
-    imgWatcher.close().then(() => console.log('Closed'));
+    console.log('stopping imgWatcher');
+    imgWatcher.close().then(() => console.log('imgWatcher stopped'));
     metricsLogger.stop();
     process.exit(0);
   } catch (err) {
@@ -44,7 +45,7 @@ async function start() {
 
   // Starting Buckeye software
   let mbase = new Multibase(config);
-  mbase.start();
+  await mbase.start();
 
   // Initialize metrics logger
   let metricsLogger = new MetricsLogger(config);

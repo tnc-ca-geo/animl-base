@@ -160,6 +160,7 @@ class MetricsLogger {
     if (this.tail) {
       this.tail.unwatch();
     }
+    console.log('metricsLogger stopped');
   }
 }
 
