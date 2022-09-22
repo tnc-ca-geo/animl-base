@@ -7,13 +7,19 @@ const MetricsLogger = require('./utils/metricsLogger');
 const config = require('./config/index');
 
 function shutDown(imgWatcher, metricsLogger, worker, mbase) {
-  console.log(`Exiting Animl Base`);
-  if (config.platform === 'linux') {
-    mbase.stop();
+  try {
+    console.log(`Exiting Animl Base`);
+    if (config.platform === 'linux') {
+      mbase.stop();
+    }
+    worker.stop();
+    imgWatcher.close().then(() => console.log('Closed'));
+    metricsLogger.stop();
+    process.exit(0);
+  } catch (err) {
+    console.log(`An error occured while exiting`);
+    process.exit(1);
   }
-  worker.stop();
-  imgWatcher.close().then(() => console.log('Closed'));
-  metricsLogger.stop();
 }
 
 function validateFile(filePath) {
@@ -67,13 +73,17 @@ async function start() {
   worker.poll();
 
   // Clean up & shut down
-  process.on('SIGTERM', shutDown(imgWatcher, metricsLogger, worker, mbase));
-  process.on('SIGINT', shutDown(imgWatcher, metricsLogger, worker, mbase));
+  process.on('SIGTERM', () => {
+    shutDown(imgWatcher, metricsLogger, worker, mbase);
+  });
+  process.on('SIGINT', () => {
+    shutDown(imgWatcher, metricsLogger, worker, mbase);
+  });
   // Windows graceful shutdown
   // NOTE: experiencing bug when console.logging here:
   // https://github.com/Unitech/pm2/issues/4925
   process.on('message', (msg) => {
-    if (msg === 'shutdown') {
+    if (msg == 'shutdown') {
       shutDown(imgWatcher, metricsLogger, worker, mbase);
     }
   });
