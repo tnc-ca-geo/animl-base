@@ -6,14 +6,14 @@ const Multibase = require('./utils/multibase');
 const MetricsLogger = require('./utils/metricsLogger');
 const config = require('./config/index');
 
-function shutDown(params) {
-  console.log(`\nExiting Animl Base`);
+function shutDown(imgWatcher, metricsLogger, worker, mbase) {
+  console.log(`Exiting Animl Base`);
   if (config.platform === 'linux') {
-    params.mbase.stop();
+    mbase.stop();
   }
-  params.worker.stop();
-  params.imgWatcher.close().then(() => console.log('Closed'));
-  params.metricsLogger.stop();
+  worker.stop();
+  imgWatcher.close().then(() => console.log('Closed'));
+  metricsLogger.stop();
 }
 
 function validateFile(filePath) {
@@ -37,8 +37,8 @@ async function start() {
   console.log('Starting Animl Base');
 
   // Starting Buckeye software
-    let mbase = new Multibase(config);
-    mbase.start();
+  let mbase = new Multibase(config);
+  mbase.start();
 
   // Initialize metrics logger
   let metricsLogger = new MetricsLogger(config);
@@ -71,14 +71,12 @@ async function start() {
   process.on('SIGINT', shutDown(imgWatcher, metricsLogger, worker, mbase));
   // Windows graceful shutdown
   // NOTE: experiencing bug when console.logging here:
-  // https://github.com/Unitech/pm2/issues/4925  
-  process.on('message', function(msg) {
-    if (msg != 'shutdown') {
-      shutDown(msg, imgWatcher, metricsLogger, worker, mbase);
+  // https://github.com/Unitech/pm2/issues/4925
+  process.on('message', (msg) => {
+    if (msg === 'shutdown') {
+      shutDown(imgWatcher, metricsLogger, worker, mbase);
     }
   });
-
-  
 }
 
 start();

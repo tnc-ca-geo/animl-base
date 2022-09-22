@@ -21,11 +21,10 @@ class Multibase {
 
   start() {
     if (this.config.platform === 'linux') {
-      console.log('Linux detected, starting Buckeye Multibase SE')
+      console.log('Linux detected, starting Buckeye Multibase SE');
       this.exec('mbasectl', ['-s']);
-    }
-    else if (this.config.platform === 'win32') {
-      console.log('Windows detected, starting Buckeye X-Manager')
+    } else if (this.config.platform === 'win32') {
+      console.log('Windows detected, starting Buckeye X-Manager');
       this.exec('C:\\BuckEyeCam\\"X7D Base"\\xbase.exe');
     }
   }

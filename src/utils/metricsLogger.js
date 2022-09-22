@@ -58,6 +58,7 @@ class MetricsLogger {
     try {
       const fields = comment.split('.');
       const idField = fields.find((field) => field.includes('CAMERAID'));
+      // TODO: Bug here? I'm getting "Cannot read property split of undefined"
       const idFieldValue = idField.split('=')[1];
       const camera = idFieldValue.split(',')[0];
       let re = new RegExp(/\d+/);
