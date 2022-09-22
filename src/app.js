@@ -14,7 +14,8 @@ async function shutDown(imgWatcher, metricsLogger, worker, mbase) {
     }
     worker.stop();
     console.log('stopping imgWatcher');
-    imgWatcher.close().then(() => console.log('imgWatcher stopped'));
+    await imgWatcher.close();
+    console.log('imgWatcher stopped')
     metricsLogger.stop();
     process.exit(0);
   } catch (err) {
