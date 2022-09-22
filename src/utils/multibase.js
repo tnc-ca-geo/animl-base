@@ -7,7 +7,7 @@ class Multibase {
 
   exec(cmd, args) {
     return new Promise((resolve, reject) => {
-      const output = { out: [], err: [] };
+      const output = { out: [], err: [], exitCode: null };
       const opts = { shell: true };
       const mbase = args ? spawn(cmd, args, opts) : spawn(cmd, opts);
       mbase.stdout.on('data', (data) => {
@@ -20,29 +20,34 @@ class Multibase {
       });
       mbase.on('exit', (code) => {
         console.log(`mbase exited with code ${code}`);
-        if (code === 0) {
-          resolve(output);
-        } else {
-          // TODO: if we try to start multibase but it's already running, it exits
-          // with code 1. We need to handle these rejections
-          reject();
-        }
+        output.exitCode = code;
+        resolve(output);
       });
     });
   }
 
   async isRunning() {
     if (this.config.platform === 'linux') {
+      let running = true;
       const state = await this.exec('mbasectl', ['-i']);
       console.log('multibase state: ', state);
+      for (const output of state.out) {
+        if (output.includes('not running')) {
+          running = false;
+        }
+      }
+      console.log('Multibase SE running? ', running);
+      return running;
     }
   }
 
   async start() {
     if (this.config.platform === 'linux') {
       console.log('Linux detected, starting Buckeye Multibase SE');
-      await this.isRunning();
-      await this.exec('mbasectl', ['-s']);
+      const running = await this.isRunning();
+      if (!running) {
+        await this.exec('mbasectl', ['-s']);
+      }
     } else if (this.config.platform === 'win32') {
       console.log('Windows detected, starting Buckeye X-Manager');
       await this.exec('C:\\BuckEyeCam\\"X7D Base"\\xbase.exe');
@@ -54,8 +59,10 @@ class Multibase {
     // does not have a CLI
     console.log('Stopping Multibase SE');
     if (this.config.platform === 'linux') {
-      await this.isRunning();
-      await this.exec('mbasectl', ['-k']);
+      const running = await this.isRunning();
+      if (running) {
+        await this.exec('mbasectl', ['-k']);
+      }
       console.log('Multibase SE stopped');
     }
   }
