@@ -41,7 +41,8 @@ function handleNewFile(filePath, queue, metricsLogger) {
 }
 
 async function start() {
-  console.log('Starting Animl Base');
+  console.log('---------------------------------\n');
+  console.log('\nStarting Animl Base');
 
   // Starting Buckeye software
   let mbase = new Multibase(config);
@@ -58,15 +59,18 @@ async function start() {
   // Initialize directory watcher
   const imgWatcher = chokidar.watch(config.imgDir, config.watcher);
   imgWatcher
-    .on('ready', () => console.log(`Watching for changes to ${config.imgDir}`))
+    .on('ready', async () => {
+      console.log(`Watching for changes to ${config.imgDir}`);
+
+      // NOTE: just for testing
+      // const filesWatchedOnStart = imgWatcher.getWatched();
+      // Object.keys(filesWatchedOnStart).forEach((dir) => {
+      //   console.log(`Number of files in ${dir} ON START: ${filesWatchedOnStart[dir].length}`);
+      //   console.log(`First image in directory: ${filesWatchedOnStart[dir][0]}`);
+      // });
+    })
     .on('add', (path) => handleNewFile(path, queue, metricsLogger))
     .on('error', (err) => console.log(`imgWatcher error: ${err}`));
-
-  // // Just for testing...
-  // const filesWatched = imgWatcher.getWatched();
-  // Object.keys(filesWatched).forEach((dir) => {
-  //   console.log(`Number of files in ${dir} : ${filesWatched[dir].length}`);
-  // });
 
   // Initialize worker
   let worker = new Worker(config, queue, imgWatcher);

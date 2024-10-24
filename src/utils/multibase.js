@@ -10,16 +10,9 @@ class Multibase {
       const output = { out: [], err: [], exitCode: null };
       const opts = { shell: true };
       const mbase = args ? spawn(cmd, args, opts) : spawn(cmd, opts);
-      mbase.stdout.on('data', (data) => {
-        console.log('mbase stdout: ', data.toString());
-        output.out.push(data.toString());
-      });
-      mbase.stderr.on('data', (data) => {
-        console.error('mbase stderr: ', data.toString());
-        output.err.push(data.toString());
-      });
+      mbase.stdout.on('data', (data) => output.out.push(data.toString()));
+      mbase.stderr.on('data', (data) => output.err.push(data.toString()));
       mbase.on('exit', (code) => {
-        console.log(`mbase exited with code ${code}`);
         output.exitCode = code;
         resolve(output);
       });
@@ -36,16 +29,16 @@ class Multibase {
           running = false;
         }
       }
-      console.log('Multibase SE running? ', running);
       return running;
     }
   }
 
   async start() {
     if (this.config.platform === 'linux') {
-      console.log('Linux detected, starting Buckeye Multibase SE');
+      console.log('Linux detected, checking Buckeye Multibase SE state...');
       const running = await this.isRunning();
       if (!running) {
+        console.log('Starting Buckeye Multibase SE...');
         await this.exec('mbasectl', ['-s']);
       }
     } else if (this.config.platform === 'win32') {
