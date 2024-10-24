@@ -53,7 +53,7 @@ class Multibase {
     if (this.config.platform === 'linux') {
       const running = await this.isRunning();
       if (running) {
-        console.log('Stopping Multibase SE');
+        console.log('Stopping Multibase SE...');
         await this.exec('mbasectl', ['-k']);
         console.log('Multibase SE stopped');
       }

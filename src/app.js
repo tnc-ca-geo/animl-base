@@ -8,17 +8,17 @@ const config = require('./config/index');
 
 async function shutDown(imgWatcher, metricsLogger, worker, mbase) {
   try {
-    console.log(`Exiting Animl Base`);
-    if (config.platform === 'linux') {
-      await mbase.stop();
-    }
+    console.log(`Stopping Animl Base...`);
     worker.stop();
     await imgWatcher.close();
     console.log('imgWatcher stopped');
     metricsLogger.stop();
+    if (config.platform === 'linux') {
+      await mbase.stop();
+    }
     process.exit(0);
   } catch (err) {
-    console.log(`An error occured while exiting`);
+    console.log(`An error occurred while exiting`);
     process.exit(1);
   }
 }
@@ -42,7 +42,7 @@ function handleNewFile(filePath, queue, metricsLogger) {
 
 async function start() {
   console.log('---------------------------------\n');
-  console.log('\nStarting Animl Base');
+  console.log('Starting Animl Base');
 
   // Starting Buckeye software
   let mbase = new Multibase(config);
