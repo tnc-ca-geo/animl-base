@@ -35,6 +35,15 @@ class Worker {
       console.log('Upload success');
       await this.queue.remove(img.path);
 
+      // move file from queue directory to archive directory
+      console.log('Moving file to archive directory');
+      const destPath = img.path.replace('queue', 'archive');
+      const destDir = path.dirname(destPath);
+      if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+      }
+      fs.renameSync(img.path, destPath);
+
       // Just for testing...
       const filesWatched = this.imgWatcher.getWatched();
       Object.keys(filesWatched).forEach((dir) => {
