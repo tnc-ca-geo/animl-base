@@ -6,7 +6,9 @@ dotenv.config();
 module.exports = {
   platform: process.platform,
   baseName: process.env.BASE_NAME,
-  imgDir: process.env.IMG_DIR,
+  watchDir: process.env.WATCH_DIR,
+  queueDir: process.env.QUEUE_DIR,
+  archiveDir: process.env.ARCHIVE_DIR,
   dbFile: 'db.json',
   logFile: process.env.LOG_FILE,
   aws: {

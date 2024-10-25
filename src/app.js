@@ -57,10 +57,10 @@ async function start() {
   await queue.init();
 
   // Initialize directory watcher
-  const imgWatcher = chokidar.watch(config.imgDir, config.watcher);
+  const imgWatcher = chokidar.watch(config.watchDir, config.watcher);
   imgWatcher
     .on('ready', async () => {
-      console.log(`Watching for changes to ${config.imgDir}`);
+      console.log(`Watching for changes to ${config.watchDir}`);
 
       // NOTE: just for testing
       // const filesWatchedOnStart = imgWatcher.getWatched();

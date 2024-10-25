@@ -289,6 +289,14 @@ $ cd animl-base
 $ npm install
 ```
 
+3. Create a directories for `~/images/queue/` and `~/images/archive/`
+
+```shell
+$ mkdir /home/animl/images
+$ mkdir /home/animl/images/queue
+$ mkdir /home/animl/images/archive
+```
+
 3. Add a .env file to the project's root directory with the following items. Note, AWS creds can be found in the [TNC Cameratrap network passwords document](https://tnc.app.box.com/file/762650708780). For access, contact nathaniel.rindlaub@tnc.org:
 
 ```
@@ -301,8 +309,12 @@ AWS_SECRET_ACCESS_KEY = [secret access key]
 AWS_REGION = us-west-2
 
 # Image directory to watch
-IMG_DIR = '/home/animl/data/<base name>/cameras/'
-# IMG_DIR = "c:\BuckEyeCam\X7D Base\pictures\" # Windows
+WATCH_DIR = '/home/animl/data/<base name>/cameras/'
+# WATCH_DIR = "c:\BuckEyeCam\X7D Base\pictures\" # Windows
+
+# Directories for queued and archived images
+QUEUE_DIR = '/home/animl/images/queue'
+ARCHIVE_DIR = '/home/animl/images/archive'
 
 # Log file to watch
 LOG_FILE = '/home/animl/data/<base name>/log.txt'
