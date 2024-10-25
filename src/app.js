@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs').promises;
 const chokidar = require('chokidar');
 const Queue = require('./utils/queue');
 const Worker = require('./utils/worker');
@@ -32,11 +33,21 @@ function validateFile(filePath) {
   return true;
 }
 
-function handleNewFile(filePath, queue, metricsLogger) {
+async function handleNewFile(filePath, queue, metricsLogger) {
   console.log(`New file detected: ${filePath}`);
-  if (validateFile(filePath)) {
-    queue.add(filePath);
-    metricsLogger.handleNewImage(filePath);
+  if (!validateFile(filePath)) return;
+  try {
+    // move file to queue directory
+    const destPath = path.join(
+      config.queueDir,
+      filePath.split('/').slice(4).join('/')
+    );
+    await fs.rename(filePath, destPath);
+    console.log(`Moved file from ${source} to ${destPath}`);
+    await metricsLogger.handleNewImage(destPath);
+    queue.add(destPath);
+  } catch (err) {
+    console.log('Error handling new file: ', err);
   }
 }
 
