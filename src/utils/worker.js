@@ -46,13 +46,13 @@ class Worker {
       }
       fs.renameSync(img.path, destPath);
 
-      // Just for testing...
-      const filesWatched = this.imgWatcher.getWatched();
-      Object.keys(filesWatched).forEach((dir) => {
-        console.log(
-          `Number of files being watched in ${dir} : ${filesWatched[dir].length}`
-        );
-      });
+      // // Just for testing...
+      // const filesWatched = this.imgWatcher.getWatched();
+      // Object.keys(filesWatched).forEach((dir) => {
+      //   console.log(
+      //     `Number of files being watched in ${dir} : ${filesWatched[dir].length}`
+      //   );
+      // });
 
       // Reset backoff and poll again
       this.backoff.reset();
