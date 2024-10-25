@@ -19,6 +19,7 @@ module.exports = {
     ignored: /(^|[\/\\])\../, // ignore dotfiles
     ignoreInitial: true, // ignore files in the directory on start
     persistent: true,
+    awaitWriteFinish: true,
   },
   supportedFileTypes: ['.jpg', '.png'],
   pollInterval: 5000,
