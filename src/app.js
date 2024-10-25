@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs').promises;
+const fs = require('fs');
 const chokidar = require('chokidar');
 const Queue = require('./utils/queue');
 const Worker = require('./utils/worker');
@@ -40,14 +40,14 @@ async function handleNewFile(filePath, queue, metricsLogger) {
     // move file to queue directory
     const destPath = path.join(
       config.queueDir,
-      filePath.split('/').slice(4).join('/')
+      filePath.split('/').slice(6).join('/')
     );
     const destDir = path.dirname(destPath);
     if (!fs.existsSync(destDir)) {
       fs.mkdirSync(destDir, { recursive: true });
     }
-    await fs.rename(filePath, destPath);
-    console.log(`Moved file from ${source} to ${destPath}`);
+    fs.renameSync(filePath, destPath);
+    console.log(`Moved file from ${filePath} to ${destPath}`);
     await metricsLogger.handleNewImage(destPath);
     queue.add(destPath);
   } catch (err) {

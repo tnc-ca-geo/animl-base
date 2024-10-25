@@ -34,7 +34,6 @@ class Worker {
       await this.s3.upload(img.path);
       console.log('Upload success');
       await this.queue.remove(img.path);
-      await this.imgWatcher.unwatch(img.path); // TODO: test whether this works
 
       // Just for testing...
       const filesWatched = this.imgWatcher.getWatched();
