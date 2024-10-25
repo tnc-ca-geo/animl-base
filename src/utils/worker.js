@@ -36,6 +36,14 @@ class Worker {
       await this.queue.remove(img.path);
       await this.imgWatcher.unwatch(img.path); // TODO: test whether this works
 
+      // Just for testing...
+      const filesWatched = this.imgWatcher.getWatched();
+      Object.keys(filesWatched).forEach((dir) => {
+        console.log(
+          `Number of files being watched in ${dir} : ${filesWatched[dir].length}`
+        );
+      });
+
       // Reset backoff and poll again
       this.backoff.reset();
       this.poll();

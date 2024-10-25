@@ -42,6 +42,10 @@ async function handleNewFile(filePath, queue, metricsLogger) {
       config.queueDir,
       filePath.split('/').slice(4).join('/')
     );
+    const destDir = path.dirname(destPath);
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
     await fs.rename(filePath, destPath);
     console.log(`Moved file from ${source} to ${destPath}`);
     await metricsLogger.handleNewImage(destPath);
