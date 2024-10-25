@@ -289,6 +289,14 @@ $ cd animl-base
 $ npm install
 ```
 
+3. Create a directories for `~/images/queue/` and `~/images/archive/`
+
+```shell
+$ mkdir /home/animl/images
+$ mkdir /home/animl/images/queue
+$ mkdir /home/animl/images/archive
+```
+
 3. Add a .env file to the project's root directory with the following items. Note, AWS creds can be found in the [TNC Cameratrap network passwords document](https://tnc.app.box.com/file/762650708780). For access, contact nathaniel.rindlaub@tnc.org:
 
 ```
@@ -301,8 +309,12 @@ AWS_SECRET_ACCESS_KEY = [secret access key]
 AWS_REGION = us-west-2
 
 # Image directory to watch
-IMG_DIR = '/home/animl/data/<base name>/cameras/'
-# IMG_DIR = "c:\BuckEyeCam\X7D Base\pictures\" # Windows
+WATCH_DIR = '/home/animl/data/<base name>/cameras/'
+# WATCH_DIR = "c:\BuckEyeCam\X7D Base\pictures\" # Windows
+
+# Directories for queued and archived images
+QUEUE_DIR = '/home/animl/images/queue'
+ARCHIVE_DIR = '/home/animl/images/archive'
 
 # Log file to watch
 LOG_FILE = '/home/animl/data/<base name>/log.txt'
@@ -414,8 +426,16 @@ $ mbasectl -i
 
 For adding new cameras, repeaters, and managing deployed devices, use the Multibase Server edition local web application, which can be found at `localhost:8888` from within the computer when Mulibase is running. You can remotely access it by remote-desktoping into the computer via AnyDesk/VCN and launchubg the local web app in a browser window if you're trying to manage the devices remotely. More detailed documentation on using the Buckeye MultiBase SE application can be found [here](https://tnc.app.box.com/file/794348600237?s=3x3e0onul82mxawahpo3qeffmzomm4uq).
 
-> NOTE: If you are having trouble adding a camera to the Base, from the Base home user interface (the page you get to after loging in and
+> [!IMPORTANT]  
+> Because animl-base moves images out of the directory that Multibase SE expects them to be in (see [explaination below](https://github.com/tnc-ca-geo/animl-base?tab=local-image-file-storage-and-archive) for more detail), it will appear in the Multibase SE webapp as though there the network has never recieved any images. We reccommend using https://animl.camera for all image review, but if you need to access the image files locally, a backup of the most recent images can be found at `~/images/archive/`.
+
+> [!TIP]
+> If you are having trouble adding a camera to the Base, from the Base home user interface (the page you get to after loging in and
 > clicking the "admin" button under the base entry), try "restoring the network" (hamburger menu -> Restore Network). This will search for and locate any devices that were have already been registered to the base.
+
+### Local image file storage and archive
+
+Typically, Buckeye's MultiBase SE program stores all image files in the `~/data/data/<base name>/cameras/` directory. However, largely due to [memory issues](https://github.com/tnc-ca-geo/animl-base/issues/20) with watching an ever-growing directory of images, once animl-base detects a new image file it moves it to a "queue" directory at `~/images/queue/`, and after it's been successfully updated it gets moved to `~/images/archive/` to serve as a local backup of the image files.
 
 ### Sixfab power managment web app (Raspberry Pi only)
 

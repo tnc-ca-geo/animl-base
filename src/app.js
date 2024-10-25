@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const chokidar = require('chokidar');
 const Queue = require('./utils/queue');
 const Worker = require('./utils/worker');
@@ -32,11 +33,25 @@ function validateFile(filePath) {
   return true;
 }
 
-function handleNewFile(filePath, queue, metricsLogger) {
+async function handleNewFile(filePath, queue, metricsLogger) {
   console.log(`New file detected: ${filePath}`);
-  if (validateFile(filePath)) {
-    queue.add(filePath);
-    metricsLogger.handleNewImage(filePath);
+  if (!validateFile(filePath)) return;
+  try {
+    // move file to queue directory
+    const destPath = path.join(
+      config.queueDir,
+      filePath.split('/').slice(6).join('/')
+    );
+    const destDir = path.dirname(destPath);
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
+    fs.renameSync(filePath, destPath);
+    console.log(`Moved file from ${filePath} to ${destPath}`);
+    await metricsLogger.handleNewImage(destPath);
+    queue.add(destPath);
+  } catch (err) {
+    console.log('Error handling new file: ', err);
   }
 }
 
@@ -57,10 +72,10 @@ async function start() {
   await queue.init();
 
   // Initialize directory watcher
-  const imgWatcher = chokidar.watch(config.imgDir, config.watcher);
+  const imgWatcher = chokidar.watch(config.watchDir, config.watcher);
   imgWatcher
     .on('ready', async () => {
-      console.log(`Watching for changes to ${config.imgDir}`);
+      console.log(`Watching for changes to ${config.watchDir}`);
 
       // NOTE: just for testing
       // const filesWatchedOnStart = imgWatcher.getWatched();

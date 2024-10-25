@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const Backoff = require('backo');
 const S3Service = require('./s3Service');
 
@@ -34,7 +36,23 @@ class Worker {
       await this.s3.upload(img.path);
       console.log('Upload success');
       await this.queue.remove(img.path);
-      await this.imgWatcher.unwatch(img.path); // TODO: test whether this works
+
+      // move file from queue directory to archive directory
+      console.log('Moving file to archive directory');
+      const destPath = img.path.replace('queue', 'archive');
+      const destDir = path.dirname(destPath);
+      if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+      }
+      fs.renameSync(img.path, destPath);
+
+      // Just for testing...
+      const filesWatched = this.imgWatcher.getWatched();
+      Object.keys(filesWatched).forEach((dir) => {
+        console.log(
+          `Number of files being watched in ${dir} : ${filesWatched[dir].length}`
+        );
+      });
 
       // Reset backoff and poll again
       this.backoff.reset();
