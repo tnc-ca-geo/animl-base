@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const Backoff = require('backo');
 const S3Service = require('./s3Service');
 
