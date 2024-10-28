@@ -81,6 +81,7 @@ class MetricsLogger {
 
     try {
       // publish to cloudwatch metrics
+      console.log('Publishing PicCountOnCamera metric to Cloudwatch...');
       var params = {
         MetricData: [
           {
@@ -120,6 +121,7 @@ class MetricsLogger {
 
     try {
       // publish to cloudwatch metrics
+      console.log('Publishing PicLatency metric to Cloudwatch...');
       var params = {
         MetricData: [
           {
