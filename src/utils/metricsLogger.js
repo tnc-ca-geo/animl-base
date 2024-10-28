@@ -65,7 +65,7 @@ class MetricsLogger {
     try {
       let re = new RegExp(/\d+/);
       const event = data.split(':EVENT:');
-      const timestamp = moment(event[0], 'YYYY/MM/DD hh:mm:ss').unix();
+      const timestamp = moment(event[0], 'YYYY/MM/DD hh:mm:ss').toDate();
       const msg = event[1].split(',');
       const camNumber = msg[0].match(re);
       const picCount = msg[1].match(re);
@@ -134,7 +134,7 @@ class MetricsLogger {
                 Value: 'camera ' + camNumber,
               },
             ],
-            Timestamp: now.unix(),
+            Timestamp: now.toDate(),
             Unit: 'Seconds',
             Value: latency,
           },
