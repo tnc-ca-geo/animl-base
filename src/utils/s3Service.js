@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const S3 = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 class S3Service {
   constructor(config) {
@@ -8,7 +8,7 @@ class S3Service {
   }
 
   init() {
-    this.s3 = new S3.S3Client({ maxRetries: 0, ...this.config });
+    this.s3 = new S3Client({ maxRetries: 0, ...this.config });
   }
 
   async upload(filePath) {
@@ -21,7 +21,7 @@ class S3Service {
       // NOTE: we MUST set content type when uploading to S3. See:
       // https://github.com/tnc-ca-geo/animl-api/issues/65
       return await this.s3.send(
-        new S3.PutObjectCommand({
+        new PutObjectCommand({
           Bucket: this.config.bucket,
           Body: fileStream,
           Key: fileName,
