@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/tnc-ca-geo/animl-base#readme",
   "dependencies": {
-    "aws-sdk": "^2.1354.0",
+    "@aws-sdk/client-cloudwatch": "^3.679.0",
+    "@aws-sdk/client-s3": "^3.679.0",
     "backo": "^1.1.0",
     "chokidar": "^3.3.1",
     "dotenv": "^8.2.0",
@@ -32,7 +33,6 @@
     "eslint": "^7.3.1",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "nodemon": "^2.0.4",
     "prettier": "^2.0.5"
   }
 }

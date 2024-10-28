@@ -2,8 +2,11 @@ const path = require('path');
 const fs = require('fs');
 const moment = require('moment');
 const Tail = require('tail').Tail;
-const AWS = require('aws-sdk');
-var exif = require('exiftool');
+const {
+  CloudWatchClient,
+  PutMetricDataCommand,
+} = require('@aws-sdk/client-cloudwatch'); // CommonJS import
+const exif = require('exiftool');
 
 class MetricsLogger {
   constructor(config) {
@@ -12,9 +15,7 @@ class MetricsLogger {
 
   async init() {
     // initialize tailing of mbase log file
-    AWS.config.logger = console;
-    AWS.config.update({ region: this.config.region });
-    this.cloudwatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' });
+    this.cloudwatch = new CloudWatchClient({ region: this.config.aws.region });
     try {
       this.tail = new Tail(this.config.logFile);
       this.tail.on('line', async (data) => {
@@ -101,7 +102,7 @@ class MetricsLogger {
         ],
         Namespace: 'Animl',
       };
-      return await this.cloudwatch.putMetricData(params).promise();
+      return await this.cloudwatch.send(new PutMetricDataCommand(params));
     } catch (e) {
       console.log('Error pushing pic counter metric to cloudwatch: ', e);
     }
@@ -140,7 +141,7 @@ class MetricsLogger {
         ],
         Namespace: 'Animl',
       };
-      return await this.cloudwatch.putMetricData(params).promise();
+      return await this.cloudwatch.send(new PutMetricDataCommand(params));
     } catch (e) {
       console.log('Error pushing pic counter metric to cloudwatch: ', e);
     }
