@@ -1,5 +1,3 @@
-const nodemon = require('nodemon');
-
 module.exports = {
   apps: [
     {
