@@ -6,7 +6,7 @@ const {
   CloudWatchClient,
   PutMetricDataCommand,
 } = require('@aws-sdk/client-cloudwatch'); // CommonJS import
-var exif = require('exiftool');
+const exif = require('exiftool');
 
 class MetricsLogger {
   constructor(config) {
