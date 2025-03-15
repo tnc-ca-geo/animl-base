@@ -179,7 +179,7 @@ For Raspberry Pi's running Raspbian OS, this can be done from the configuration/
 $ mkdir /home/animl/data
 ```
 
-2. Download the appropriate MulitBase SE version for your computer [here](https://www.buckeyecameras.com/downloads.html)
+2. Download the appropriate MulitBase SE version for your computer [here](https://www.buckeyecam.com/pages/downloads)
    and unzip using
 
 ```shell
