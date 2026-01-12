@@ -11,6 +11,14 @@ module.exports = {
       time: true,
       shutdown_with_message: true,
       kill_timeout: 5000,
+    }, {
+      name: 'disk-management',
+      script: './crons/disk.js',
+      instances: 1,
+      exec_mode: 'fork',
+      cron_restart: "0,30 * * * *",
+      watch: false,
+      autorestart: false
     },
     // {
     //   name: 'temperature-logger',

@@ -110,3 +110,6 @@ dist
 
 #DS store
 .DS_Store
+
+# data directories
+images/
