@@ -3,8 +3,10 @@
  * but I try to keep the concerns separated for now since we running the disk
  * management on its on process.
  */
-import { config } from 'dotenv';
-config();
+const dotenv = require('dotenv');
+dotenv.config();
 
-export const queueDir = process.env.QUEUE_DIR;
-export const archiveDir = process.env.ARCHIVE_DIR;
+module.exports = {
+  queueDir: process.env.QUEUE_DIR,
+  archiveDir: process.env.ARCHIVE_DIR,
+};
