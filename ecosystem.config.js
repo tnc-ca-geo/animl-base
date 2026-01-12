@@ -13,7 +13,7 @@ module.exports = {
       kill_timeout: 5000,
     }, {
       name: 'disk-management',
-      script: './crons/disk.js',
+      script: './cron/disk.js', 
       instances: 1,
       exec_mode: 'fork',
       cron_restart: "0,30 * * * *",
