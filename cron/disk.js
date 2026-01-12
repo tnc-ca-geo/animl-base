@@ -2,7 +2,7 @@
  * Manage disk space in order to ensure that field computers don't get glogged
  * up with old files.
  */
-import config from './config/index';
+import config from './config/index.js';
 
 
 async function start() {
