@@ -7,15 +7,20 @@
  */
 const https = require('https');
 const os = require('os');
+const config = require('./config/index');
 
 /**
  * Send a POST query every day
  */
 async function start() {
+
+  const subscriptions = config.watchdogSubscriptions.split(',')
+
   const data = JSON.stringify({
     type: 'tnc',
     device_id: `animl-computer-${os.hostname()}`,
-    label: 'test-machine',
+    label: config.watchdogLabel,
+    subscriptions: subscriptions
   });
   const options = {
     host: 'api-dev.iotwatchdog.org',
@@ -25,7 +30,7 @@ async function start() {
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(data),
-      'x-api-key': '048lrowIBgaADabx539RFpHfQM25ECa9xqUO4Znc',
+      'x-api-key': config.watchdogXApiKey,
     },
   };
   const req = https.request(options, (res) => {

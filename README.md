@@ -410,9 +410,18 @@ To persist changed to ```ecosystem.config.js``` run:
 
 ```
 $ pm2 stop all
+$ pm2 delete
 $ pm2 start --update-env
 $ pm2 save
 ```
+
+The use of ```pm2 delete``` is a little bit brute force here and there are some
+more subtle ways such as the ```--cron-restart="0 1 * * *"``` flag. However
+that approach would not read the cron schedule from ```ecosystem.config.js```
+but set an arbitrary value that could be out of sync.
+
+In the overview displayed by ```pm2 list``` the CRON jobs will appear as
+stopped unless they are currently running.
 
 The CRON jobs can be configured with following parameters in ```.env```:
 
