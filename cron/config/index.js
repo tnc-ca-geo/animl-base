@@ -13,6 +13,8 @@ module.exports = {
   archiveLimit: process.env.ARCHIVE_LIMIT_GB,
   diskLimit: process.env.DISK_LIMIT_PERCENT,
   watchdogApiEndPoint: 'api-dev.iotwatchdog.org',
+  // for production
+  // watchdogApiEndPoint: 'api.iotwatchdog.org',
   watchdogXApiKey: process.env.WATCHDOG_X_API_KEY,
   watchdogSubscriptions: process.env.WATCHDOG_SUBSCRIPTIONS,
   watchdogLabel: process.env.WATCHDOG_LABEL

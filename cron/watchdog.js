@@ -25,7 +25,7 @@ async function start() {
   const options = {
     host: 'api-dev.iotwatchdog.org',
     port: 443,
-    path: '/hook/1500',
+    path: '/hook/62',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
