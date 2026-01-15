@@ -90,11 +90,11 @@ async function reduce_directory( directory, percentage ) {
 };
 
 /**
- * The job function tying everything together.
+ * The start function tying everything together.
  */
 async function start() {
   if (!['linux', 'darwin'].includes(process.platform)) {
-    console.log('Cron job not tested on non-Linux-like systems');
+    console.log('Disk management job not tested on non-Linux-like systems');
     return;
   }
   // get metrics from file system and configuration
@@ -102,7 +102,7 @@ async function start() {
   const freeGB = await getFreeGB('/');
   const queueLimit = Number(config.queueLimit ?? freeGB/10).toFixed(2);
   const archiveLimit = Number(config.archiveLimit ?? freeGB/10).toFixed(2);
-  const diskPercentage = Number((totalGB-freeGB)/totalGB * 100).toFixed(0);
+  let diskPercentage = Number((totalGB-freeGB)/totalGB * 100).toFixed(0);
   let queueGB = await getDirectorySize(config.queueDir);
   let archiveGB = await getDirectorySize(config.archiveDir);
   // some useful output
@@ -121,18 +121,25 @@ async function start() {
     await reduce_directory(config.archiveDir, 20);
     archiveGB = await getDirectorySize(config.archiveDir);
   }
-  // 2. Reduce queue (if the queue fills up there is a connectivity issue)
-  // if queue max size is reached
+  // 2. Reduce queue, if queue max size is reached. If we arrive here that means
+  // that the field computer has connectivity issues and cannot upload images to
+  // the cloud.
   if (queueGB > queueLimit) {
     await reduce_directory(config.queueDir, 20);
+    queueGB = await getDirectorySize(config.queueDir);
   }
-  // 3.
-  if (diskPercentage > config.diskLimit ) {
+  // 3. Reduce archive until we are lower than the disk limit or have less than
+  // one GB of images left in the archiveDir
+  if ( diskPercentage > config.diskLimit && archiveGB > 1 ) {
     await reduce_directory(config.archiveDir, 50);
+    diskPercentage = Number((totalGB-freeGB)/totalGB * 100).toFixed(0);
   }
-  // reduce the queue if disk is still too full after deleting from archiveDir
+  // 4. Reduce the queue if disk is still too full after deleting from
+  // archiveDir. If arriving here we would be in a rather dire situation and
+  // would prioritize keeping the system alive over retaining any images
   if (diskPercentage > config.diskLimit ) {
     await reduce_directory(config.queueDir, 20);
+    diskPercentage = Number((totalGB-freeGB)/totalGB * 100).toFixed(0);
   }
 console.log('DONE')
 }

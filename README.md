@@ -410,7 +410,7 @@ To persist changed to ```ecosystem.config.js``` run:
 
 ```
 $ pm2 stop all
-$ pm2 start
+$ pm2 start --update-env
 $ pm2 save
 ```
 
