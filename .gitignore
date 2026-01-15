@@ -113,3 +113,5 @@ dist
 
 # data directories
 images/
+# a test image
+test.jpg

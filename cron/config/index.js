@@ -9,4 +9,7 @@ dotenv.config();
 module.exports = {
   queueDir: process.env.QUEUE_DIR,
   archiveDir: process.env.ARCHIVE_DIR,
+  queueLimit: process.env.QUEUE_LIMIT_GB,
+  archiveLimit: process.env.ARCHIVE_LIMIT_GB,
+  diskLimit: process.env.DISK_LIMIT_PERCENT
 };

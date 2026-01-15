@@ -397,6 +397,44 @@ $ pm2 delete all
 Following that, startup and re-save the process as you did before by followin
 the steps above starting with `npm run start-daemon`.
 
+### CRON jobs
+
+The installation will also implement two CRON jobs to manage resources on the
+computer. The first one (```disk-management```) deletes a random subset of
+archived images on the computer if the disk is in danger of running out of
+space. The second one (```watchdog```) issues a POST request to a watchdog API
+that will send emails if the field computer is down, both jobs are run daily,
+a configuration that can be changed in ```ecosystem.config.js```. Both jobs can
+be turn off by commenting out the job definition in ```ecosystem.config.js```.
+To persist changed to ```ecosystem.config.js``` run:
+
+```
+$ pm2 stop all
+$ pm2 start
+$ pm2 save
+```
+
+The CRON jobs can be configured with following parameters in ```.env```:
+
+**disk-management**:
+
+- QUEUE_LIMIT_GB: Set the size of the queue directory that will trigger a queue purge, a random 20% percent of images will be deleted. This process will be triggered repeatedly until below the limit. Note: The limit will be *exceeded* before the script is triggered.
+
+- ARCHIVE_LIMIT_GB: Set the size of the archive directory that will trigger an archive purge, a random 20% percent of images will be deleted. This process will be triggered repeatedly until below the limit. Note: The limit will be *exceeded* before the script is triggered.
+
+- DISK_LIMIT_PERCENT: The percentage of the overall disk use before an archive or a queue purge will be triggered despite the actual size of archive and queue. The archive would be emptied entirely before also the queue will be purged. This is for extreme situations only, e.g., if the field computer is offline for a very long time. like months.
+
+**watchdog**
+
+- WATCHDOG_X_API_KEY: The API key for the watchdog API.
+
+- WATCHDOG_LABEL: A custom label to use for referencing to the computer in watchdog emails.
+
+- WATCHDOG_SUBSCRIPTIONS: A string of comma-separated email addresses to which watchdog messages will be sent.
+
+For all available ```.env``` parameters see ```template.env```.
+
+
 ## Managment
 
 ### Check the status of the apps
@@ -426,7 +464,7 @@ $ mbasectl -i
 
 For adding new cameras, repeaters, and managing deployed devices, use the Multibase Server edition local web application, which can be found at `localhost:8888` from within the computer when Mulibase is running. You can remotely access it by remote-desktoping into the computer via AnyDesk/VCN and launchubg the local web app in a browser window if you're trying to manage the devices remotely. More detailed documentation on using the Buckeye MultiBase SE application can be found [here](https://tnc.app.box.com/file/794348600237?s=3x3e0onul82mxawahpo3qeffmzomm4uq).
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Because animl-base moves images out of the directory that Multibase SE expects them to be in (see [explaination below](https://github.com/tnc-ca-geo/animl-base?tab=local-image-file-storage-and-archive) for more detail), it will appear in the Multibase SE webapp as though there the network has never recieved any images. We reccommend using https://animl.camera for all image review, but if you need to access the image files locally, a backup of the most recent images can be found at `~/images/archive/`.
 
 > [!TIP]
