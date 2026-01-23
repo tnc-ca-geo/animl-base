@@ -22,7 +22,7 @@ class Multibase {
   async isRunning() {
     if (this.config.platform === 'linux') {
       let running = true;
-      const state = await this.exec('mbasectl', ['-i']);
+      const state = await this.exec('mbasectl -i');
       console.log('multibase state: ', state);
       for (const output of state.out) {
         if (output.includes('not running')) {
@@ -39,7 +39,7 @@ class Multibase {
       const running = await this.isRunning();
       if (!running) {
         console.log('Starting Buckeye Multibase SE...');
-        await this.exec('mbasectl', ['-s']);
+        await this.exec('mbasectl -s');
       }
     } else if (this.config.platform === 'win32') {
       console.log('Windows detected, starting Buckeye X-Manager');
@@ -54,7 +54,7 @@ class Multibase {
       const running = await this.isRunning();
       if (running) {
         console.log('Stopping Multibase SE...');
-        await this.exec('mbasectl', ['-k']);
+        await this.exec('mbasectl -k');
         console.log('Multibase SE stopped');
       }
     }
