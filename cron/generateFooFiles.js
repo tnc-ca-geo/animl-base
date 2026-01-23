@@ -15,8 +15,9 @@ function delay(ms) {
 async function start() {
   let index = 0;
   while (1) {
-    const indexStr = String(index).padStart(7, '0')
-    const newFileName = `${config.archiveDir}/test_${indexStr}.jpg`
+    const randomNumber = Math.floor(Math.random() * 10000000) - 1;
+    const indexStr = String(randomNumber).padStart(7, '0')
+    const newFileName = `${config.watchDir}/test_${indexStr}.jpg`
     fs.copyFile(example_image, newFileName, (err) => {
       if (err && err.code === 'ENOENT') {
         console.log(

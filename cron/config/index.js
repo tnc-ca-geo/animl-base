@@ -12,6 +12,8 @@ module.exports = {
   queueLimit: process.env.QUEUE_LIMIT_GB,
   archiveLimit: process.env.ARCHIVE_LIMIT_GB,
   diskLimit: process.env.DISK_LIMIT_PERCENT,
+  // for testing and foo image generation
+  watchDir: process.env.WATCH_DIR,
   watchdogApiEndPoint: 'api-dev.iotwatchdog.org',
   // for production
   // watchdogApiEndPoint: 'api.iotwatchdog.org',
