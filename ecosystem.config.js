@@ -17,7 +17,7 @@ module.exports = {
       script: './cron/disk.js',
       instances: 1,
       exec_mode: 'fork',
-      cron_restart: '*/10 * * * *',
+      cron_restart: '* */1 * * *',
       watch: false,
       autorestart: false,
     },

@@ -9,9 +9,9 @@ dotenv.config();
 module.exports = {
   queueDir: process.env.QUEUE_DIR,
   archiveDir: process.env.ARCHIVE_DIR,
-  queueLimit: process.env.QUEUE_LIMIT_GB,
-  archiveLimit: process.env.ARCHIVE_LIMIT_GB,
-  diskLimit: process.env.DISK_LIMIT_PERCENT,
+  diskLimit: process.env.DISK_LIMIT_PERCENT || 60,
+  diskMountPath: process.env.DISK_MOUNTING_PATH || '/',
+  deleteQueueForDisk: process.env.DELETE_QUEUE_FOR_DISK || false,
   // for testing and foo image generation
   watchDir: process.env.WATCH_DIR,
   watchdogApiEndPoint: 'api-dev.iotwatchdog.org',
