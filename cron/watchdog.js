@@ -8,11 +8,16 @@
 const https = require('https');
 const os = require('os');
 const config = require('./config/index');
+const { InventoryConfigurationFilterSensitiveLog } = require('@aws-sdk/client-s3');
 
 /**
  * Send a POST query every day
  */
 async function start() {
+
+  if (!config.watchdogEnabled) {
+    return;
+  }
 
   const subscriptions = config.watchdogSubscriptions.split(',')
 

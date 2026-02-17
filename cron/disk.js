@@ -3,14 +3,16 @@
  * with too many files.
  *
  * NOTE: Disk usage can go beyond the configured maximum between script
- * runs, configure accordingly.
+ * runs, configure some head room accordingly.
  */
 const config = require('./config/index');
 const fs = require('fs').promises;
 const path = require('path');
 
 /**
- * Gets size of a (mounted) disk
+ * Gets size of a (mounted) disk. The concept of mounted disk is important
+ * because all disk size operations are related to the disk on which the
+ * requested directory resides.
  * @param {str} mountPath: mounted path, in most cases '/'
  * @returns {Number}
  */
@@ -149,4 +151,7 @@ async function start() {
   }
 }
 
+/**
+ * Run it!
+ */
 start()

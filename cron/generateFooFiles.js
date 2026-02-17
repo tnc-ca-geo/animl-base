@@ -1,17 +1,24 @@
 /*
- * A script that generates files in a certain (depending on CRON settings)
- * frequency. Used to test disk.js
- * NOTE: DISABLE IN PRODUCTION
+ * Generates foo files in a certain frequency by copying an existing on to
+ * random file names into the archive directory. Used to test disk.js.
  */
 const config = require('./config/index');
 const fs = require('fs');
 
 example_image = '/home/animl/test1.jpg'
 
+/**
+ * Delays execution for ms miliseconds.
+ * @param {Number} ms
+ * @returns Promise
+ */
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * The main function.
+ */
 async function start() {
   let index = 0;
   while (1) {
@@ -30,8 +37,11 @@ async function start() {
       }
     }
     index += 1;
-    await delay(10);
+    await delay(1000);
   }
 }
 
+/**
+ * Run it!
+ */
 start();
