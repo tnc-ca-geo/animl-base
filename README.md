@@ -402,17 +402,18 @@ the steps above starting with `npm run start-daemon`.
 The installation will also implement two CRON jobs to manage resources on the
 computer. The first one (```disk-management```) deletes a random subset of
 archived images on the computer if the disk is in danger of running out of
-space. The second one (```watchdog```) issues a POST request to a watchdog API
-that will send emails if the field computer is down, both jobs are run daily,
-a configuration that can be changed in ```ecosystem.config.js```. Both jobs can
-be turn off by commenting out the job definition in ```ecosystem.config.js```.
-To persist changed to ```ecosystem.config.js``` run:
+space (runs every hour). The second one (```watchdog```) issues a POST request
+to a watchdog API that will send emails if the field computer is down (runs
+daily). The frequency on which the scripts run can be changed in
+```ecosystem.config.js```. Both jobs can be turn off by commenting out the job
+definition in ```ecosystem.config.js```. To persist changed to
+```ecosystem.config.js``` run:
 
 ```
 $ pm2 stop all
-$ pm2 delete
+$ pm2 delete  # important to reset CRON jobs
 $ pm2 start --update-env
-$ pm2 save
+$ pm2 save    # import to persist changes despite system restarts
 ```
 
 The use of ```pm2 delete``` is a little bit brute force here and there are some
@@ -427,21 +428,36 @@ The CRON jobs can be configured with following parameters in ```.env```:
 
 **disk-management**:
 
-- QUEUE_LIMIT_GB: Set the size of the queue directory that will trigger a queue purge, a random 20% percent of images will be deleted. This process will be triggered repeatedly until below the limit. Note: The limit will be *exceeded* before the script is triggered.
+- ```DISK_LIMIT_PERCENT``` (default 60): The percentage of the overall disk use
+before an archive or a queue purge will be triggered despite the actual size of
+archive and queue. The archive would be emptied entirely before the queue will
+be purged (if enabled). This is for extreme situations only, e.g., if the field
+computer is offline for a very long time. like months.
 
-- ARCHIVE_LIMIT_GB: Set the size of the archive directory that will trigger an archive purge, a random 20% percent of images will be deleted. This process will be triggered repeatedly until below the limit. Note: The limit will be *exceeded* before the script is triggered.
+- ```DISK_MOUNT_PATH``` (default '/'): If more than one disk is mounted to the
+system this needs to point to the directory where the disk used by animl is
+mounted.
 
-- DISK_LIMIT_PERCENT: The percentage of the overall disk use before an archive or a queue purge will be triggered despite the actual size of archive and queue. The archive would be emptied entirely before also the queue will be purged. This is for extreme situations only, e.g., if the field computer is offline for a very long time. like months.
+- ```DELETE_QUEUE_FOR_DISK```: (default false): If true it will also purge the
+queue for recovering disk space but only as a very last resort depending which
+situation is more important; either that the computer stays online or that all
+files will be maintaned until forwarded to the cloud. Again, this is a dire
+emergency situation that should not occur in normal operation.
 
 **watchdog**
 
-- WATCHDOG_X_API_KEY: The API key for the watchdog API.
+- ```WATCHDOG_ENABLE``` (default true): Enable the watchdog.
 
-- WATCHDOG_LABEL: A custom label to use for referencing to the computer in watchdog emails.
+- ```WATCHDOG_X_API_KEY```: The API key for the watchdog API.
 
-- WATCHDOG_SUBSCRIPTIONS: A string of comma-separated email addresses to which watchdog messages will be sent.
+- ```WATCHDOG_LABEL```: A custom label to use for referencing to the computer in
+watchdog emails.
 
-For all available ```.env``` parameters see ```template.env```.
+- ```WATCHDOG_SUBSCRIPTIONS```: A string of comma-separated email addresses to
+which watchdog messages will be sent.
+
+For all available ```.env``` parameters see ```template.env```. For simplicity
+the ```template.env``` can be copied to ```.env``` and then edited.
 
 
 ## Managment
