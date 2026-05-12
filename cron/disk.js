@@ -78,9 +78,15 @@ async function conditionalDelete(file, percentageDelete) {
 async function processFiles(dirPath, del = false) {
   let directorySize = 0;
   const dir = await fs.opendir(dirPath);
+  const supportedExtensions = new Set(['.jpg', '.jpeg', '.png']);
   for await (const dirent of dir) {
     if (dirent.isFile()) {
       const filePath = path.join(dirPath, dirent.name);
+      const ext = path.extname(dirent.name).toLowerCase();
+      if (!supportedExtensions.has(ext)) {
+        console.log(`Skipping unsupported file ${filePath}`);
+        continue;
+      }
       let res = filePath;
       if (del) {
         res = await conditionalDelete(filePath, 10);
