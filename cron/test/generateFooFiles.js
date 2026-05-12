@@ -4,7 +4,7 @@
  * Generates foo files in a certain frequency by copying an existing on to
  * random file names into the archive directory. Used to test disk.js.
  */
-const config = require('./config/index');
+const config = require('../config/index');
 const fs = require('fs');
 
 const example_image = '/home/animl/test1.jpg';
