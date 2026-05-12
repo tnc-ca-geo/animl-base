@@ -9,7 +9,7 @@ dotenv.config();
 module.exports = {
   queueDir: process.env.QUEUE_DIR,
   archiveDir: process.env.ARCHIVE_DIR,
-  diskLimit: process.env.DISK_LIMIT_PERCENT || 60,
+  diskLimit: Number(process.env.DISK_LIMIT_PERCENT) || 60,
   diskMountPath: process.env.DISK_MOUNT_PATH || '/',
   // env variables are always strings and they must be elevated as such
   deleteQueueForDisk: process.env.DELETE_QUEUE_FOR_DISK == 'true',

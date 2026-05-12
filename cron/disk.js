@@ -43,9 +43,9 @@ async function getFreeGB(mountPath) {
 async function getDiskPercentage(mountPath = '/') {
   const totalGB = await getSizeGB(mountPath);
   const freeGB = await getFreeGB(mountPath);
-  const percentage = Number(((totalGB - freeGB) / totalGB) * 100).toFixed(1);
+  const percentage = Number(((totalGB - freeGB) / totalGB) * 100);
   console.log(
-    `Disk: ${percentage}% of ${totalGB}GB full; ${freeGB}GB available`
+    `Disk: ${percentage.toFixed(1)}% of ${totalGB}GB full; ${freeGB}GB available`
   );
   return percentage;
 }
