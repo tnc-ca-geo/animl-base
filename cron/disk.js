@@ -90,12 +90,10 @@ async function processFiles(dirPath, del = false) {
         const fileStat = await fs.stat(filePath);
         directorySize += fileStat.size;
       }
-    } else {
-      directorySize += await processFiles(
-        path.join(dirPath, dirent.name),
-        del
-      );
+    } else if (dirent.isDirectory()) {
+      directorySize += await processFiles(path.join(dirPath, dirent.name), del);
     }
+    // skip symlinks and other special entries to avoid escaping the tree
   }
   return directorySize;
 }
