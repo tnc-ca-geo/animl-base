@@ -16,9 +16,9 @@ const path = require('path');
  * @param {str} mountPath: mounted path, in most cases '/'
  * @returns {Number}
  */
-async function getSizeGB( mountPath ) {
-  const stats = await fs.statfs( mountPath );
-  return (stats.blocks * stats.bsize / 1e9).toFixed(2);
+async function getSizeGB(mountPath) {
+  const stats = await fs.statfs(mountPath);
+  return ((stats.blocks * stats.bsize) / 1e9).toFixed(2);
 }
 
 /**
@@ -26,9 +26,9 @@ async function getSizeGB( mountPath ) {
  * @param {path} mountPath: mounted path, in most cases '/'
  * @returns {Number}
  */
-async function getFreeGB( mountPath ) {
-  const stats = await fs.statfs( mountPath );
-  return (stats.bfree * stats.bsize / 1e9).toFixed(2);
+async function getFreeGB(mountPath) {
+  const stats = await fs.statfs(mountPath);
+  return ((stats.bfree * stats.bsize) / 1e9).toFixed(2);
 }
 
 /**
@@ -38,12 +38,13 @@ async function getFreeGB( mountPath ) {
  * @returns {Number}
  *
  */
-async function getDiskPercentage ( mountPath='/' ) {
+async function getDiskPercentage(mountPath = '/') {
   const totalGB = await getSizeGB(mountPath);
   const freeGB = await getFreeGB(mountPath);
-  const percentage = Number((totalGB-freeGB)/totalGB * 100).toFixed(1);
+  const percentage = Number(((totalGB - freeGB) / totalGB) * 100).toFixed(1);
   console.log(
-    `Disk: ${percentage}% of ${totalGB}GB full; ${freeGB}GB available`);
+    `Disk: ${percentage}% of ${totalGB}GB full; ${freeGB}GB available`
+  );
   return percentage;
 }
 
@@ -53,16 +54,16 @@ async function getDiskPercentage ( mountPath='/' ) {
  * @param {Number} percentageDelete
  * @returns {string, undefined} return file if still on the disk or undefined
  */
-async function conditionalDelete( file, percentageDelete ) {
+async function conditionalDelete(file, percentageDelete) {
   const randomNumber = Math.floor(Math.random() * 100) + 1;
   if (randomNumber > 100 - percentageDelete) {
     console.log(`Deleted ${file}`);
-    await fs.unlink( file );
+    await fs.unlink(file);
     return;
   } else {
     return file;
   }
-};
+}
 
 /**
  * Iterate over the files in the directory without loading a long list into
@@ -72,24 +73,26 @@ async function conditionalDelete( file, percentageDelete ) {
  * @param {boolean} del
  * @returns Number
  */
-async function processFiles( dirPath, del=false ) {
+async function processFiles(dirPath, del = false) {
   let directorySize = 0;
-  const dir = await fs.opendir( dirPath );
+  const dir = await fs.opendir(dirPath);
   for await (const dirent of dir) {
     if (dirent.isFile()) {
-      const filePath = path.join( dirPath, dirent.name );
+      const filePath = path.join(dirPath, dirent.name);
       let res = filePath;
       if (del) {
-        res = await conditionalDelete( filePath, 10 );
+        res = await conditionalDelete(filePath, 10);
       }
       // add up remaining disk use
-      if ( res ) {
-        const fileStat = await fs.stat( filePath );
+      if (res) {
+        const fileStat = await fs.stat(filePath);
         directorySize += fileStat.size;
       }
     } else {
       directorySize += await processFiles(
-        path.join(dirPath, dirent.name), del=del);
+        path.join(dirPath, dirent.name),
+        (del = del)
+      );
     }
   }
   return directorySize;
@@ -103,27 +106,29 @@ async function processFiles( dirPath, del=false ) {
  *  disk mounted
  * @param { Number } limitPercentage
  */
-async function reduceDirectory( directory, mountPath, limitPercentage ) {
-  let diskPercent = await getDiskPercentage(mountPath=config.mountPath);
-  if ( diskPercent < config.diskLimit ) {
+async function reduceDirectory(directory, mountPath, limitPercentage) {
+  let diskPercent = await getDiskPercentage((mountPath = config.diskMountPath));
+  if (diskPercent < config.diskLimit) {
     console.log(
-      `More than ${100-config.diskLimit}% of disk space left. Exiting.\n`)
+      `More than ${100 - config.diskLimit}% of disk space left. Exiting.\n`
+    );
     return;
   }
-  let dirSize = await processFiles( directory, del=false );
-  console.log(`Size of ${directory} is ${dirSize/1E9} GB`);
+  let dirSize = await processFiles(directory, (del = false));
+  console.log(`Size of ${directory} is ${dirSize / 1e9} GB`);
   let reduced = false;
-  while ( diskPercent > limitPercentage && Number(dirSize) > 1E9 ) {
-    dirSize = await processFiles( directory, del=true );
-    diskPercent = await getDiskPercentage( mountPath=mountPath );
+  while (diskPercent > limitPercentage && Number(dirSize) > 1e9) {
+    dirSize = await processFiles(directory, (del = true));
+    diskPercent = await getDiskPercentage((mountPath = mountPath));
     reduced = true;
   }
-  if ( !reduced ) {
-    console.log(`Size of ${ config.archiveDir } cannot be further reduced.`)
+  if (!reduced) {
+    console.log(`Size of ${config.archiveDir} cannot be further reduced.`);
   } else {
     console.log(
-    `Size of ${ directory } is ` +
-    `${Number( dirSize/1E9).toFixed(2) } GB after reduction.`)
+      `Size of ${directory} is ` +
+        `${Number(dirSize / 1e9).toFixed(2)} GB after reduction.`
+    );
   }
 }
 
@@ -137,21 +142,30 @@ async function start() {
   // Some useful output
   console.log(
     '\nDisk space supervisor' +
-    '\n---------------------\n' +
-    `${new Date().toLocaleString()}\n\n` +
-    `Disk use limit ${config.diskLimit}%`)
+      '\n---------------------\n' +
+      `${new Date().toLocaleString()}\n\n` +
+      `Disk use limit ${config.diskLimit}%`
+  );
 
   // 1. Try to reach disk usage goal by reducing the archive directory.
-  await reduceDirectory(config.archiveDir, config.mountPath, config.diskLimit);
+  await reduceDirectory(
+    config.archiveDir,
+    config.diskMountPath,
+    config.diskLimit
+  );
 
   // 2. Try to reach the disk usage goal by reducing the queue directory, if enabled.
   // Note: This should be an extremely rare undesireable condition.
   if (config.deleteQueueForDisk) {
-    await reduceDirectory(config.queueDir, config.mountPath, config.diskLimit);
+    await reduceDirectory(
+      config.queueDir,
+      config.diskMountPath,
+      config.diskLimit
+    );
   }
 }
 
 /**
  * Run it!
  */
-start()
+start();
