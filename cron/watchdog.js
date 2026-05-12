@@ -19,6 +19,22 @@ async function start() {
     return;
   }
 
+  // check for required env variables
+  if (!config.watchdogXApiKey) {
+    console.log('Error: WATCHDOG_X_API_KEY is not set in .env. Exiting.');
+    return;
+  }
+
+  if (!config.watchdogLabel) {
+    console.log('Error: WATCHDOG_LABEL is not set in .env. Exiting.');
+    return;
+  }
+
+  if (!config.watchdogSubscriptions) {
+    console.log('Error: WATCHDOG_SUBSCRIPTIONS is not set in .env. Exiting.');
+    return;
+  }
+
   const subscriptions = config.watchdogSubscriptions.split(',');
 
   const data = JSON.stringify({
