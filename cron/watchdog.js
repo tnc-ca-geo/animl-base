@@ -26,7 +26,7 @@ async function start() {
     subscriptions: subscriptions,
   });
   const options = {
-    host: 'api-dev.iotwatchdog.org',
+    host: config.watchdogApiEndPoint,
     port: 443,
     path: '/hook/62',
     method: 'POST',
