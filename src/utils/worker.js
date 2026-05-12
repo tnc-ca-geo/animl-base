@@ -58,6 +58,13 @@ class Worker {
       this.backoff.reset();
       this.poll();
     } catch (err) {
+      if (err.code === 'ENOENT') {
+        console.log(`File no longer exists, removing from queue: ${img?.path}`);
+        if (img?.path) await this.queue.remove(img.path);
+        this.backoff.reset();
+        this.poll();
+        return;
+      }
       // Increment backoff duration and poll again
       console.log('Error processing job: ', err);
       console.log('Backing off then retrying...');

@@ -397,6 +397,69 @@ $ pm2 delete all
 Following that, startup and re-save the process as you did before by followin
 the steps above starting with `npm run start-daemon`.
 
+### CRON jobs
+
+The installation will also implement two CRON jobs to manage resources on the
+computer. The first one (```disk-management```) deletes a random subset of
+archived images on the computer if the disk is in danger of running out of
+space (runs every hour). The second one (```watchdog```) issues a POST request
+to a watchdog API that will send emails if the field computer is down (runs
+daily). The frequency on which the scripts run can be changed in
+```ecosystem.config.js```. Both jobs can be turn off by commenting out the job
+definition in ```ecosystem.config.js```. To persist changed to
+```ecosystem.config.js``` run:
+
+```
+$ pm2 stop all
+$ pm2 delete  # important to reset CRON jobs
+$ pm2 start --update-env
+$ pm2 save    # import to persist changes despite system restarts
+```
+
+The use of ```pm2 delete``` is a little bit brute force here and there are some
+more subtle ways such as the ```--cron-restart="0 1 * * *"``` flag. However
+that approach would not read the cron schedule from ```ecosystem.config.js```
+but set an arbitrary value that could be out of sync.
+
+In the overview displayed by ```pm2 list``` the CRON jobs will appear as
+stopped unless they are currently running.
+
+The CRON jobs can be configured with following parameters in ```.env```:
+
+**disk-management**:
+
+- ```DISK_LIMIT_PERCENT``` (default 60): The percentage of the overall disk use
+before an archive or a queue purge will be triggered despite the actual size of
+archive and queue. The archive would be emptied entirely before the queue will
+be purged (if enabled). This is for extreme situations only, e.g., if the field
+computer is offline for a very long time. like months.
+
+- ```DISK_MOUNT_PATH``` (default '/'): If more than one disk is mounted to the
+system this needs to point to the directory where the disk used by animl is
+mounted.
+
+- ```DELETE_QUEUE_FOR_DISK```: (default false): If true it will also purge the
+queue for recovering disk space but only as a very last resort depending which
+situation is more important; either that the computer stays online or that all
+files will be maintaned until forwarded to the cloud. Again, this is a dire
+emergency situation that should not occur in normal operation.
+
+**watchdog**
+
+- ```WATCHDOG_ENABLE``` (default true): Enable the watchdog.
+
+- ```WATCHDOG_X_API_KEY```: The API key for the watchdog API.
+
+- ```WATCHDOG_LABEL```: A custom label to use for referencing to the computer in
+watchdog emails.
+
+- ```WATCHDOG_SUBSCRIPTIONS```: A string of comma-separated email addresses to
+which watchdog messages will be sent.
+
+For all available ```.env``` parameters see ```template.env```. For simplicity
+the ```template.env``` can be copied to ```.env``` and then edited.
+
+
 ## Managment
 
 ### Check the status of the apps
@@ -426,7 +489,7 @@ $ mbasectl -i
 
 For adding new cameras, repeaters, and managing deployed devices, use the Multibase Server edition local web application, which can be found at `localhost:8888` from within the computer when Mulibase is running. You can remotely access it by remote-desktoping into the computer via AnyDesk/VCN and launchubg the local web app in a browser window if you're trying to manage the devices remotely. More detailed documentation on using the Buckeye MultiBase SE application can be found [here](https://tnc.app.box.com/file/794348600237?s=3x3e0onul82mxawahpo3qeffmzomm4uq).
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Because animl-base moves images out of the directory that Multibase SE expects them to be in (see [explaination below](https://github.com/tnc-ca-geo/animl-base?tab=local-image-file-storage-and-archive) for more detail), it will appear in the Multibase SE webapp as though there the network has never recieved any images. We reccommend using https://animl.camera for all image review, but if you need to access the image files locally, a backup of the most recent images can be found at `~/images/archive/`.
 
 > [!TIP]
