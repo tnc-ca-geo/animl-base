@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Manage disk space in order to ensure that field computers don't clog up
  * with too many files.
@@ -91,7 +93,7 @@ async function processFiles(dirPath, del = false) {
     } else {
       directorySize += await processFiles(
         path.join(dirPath, dirent.name),
-        (del = del)
+        del
       );
     }
   }
@@ -107,19 +109,19 @@ async function processFiles(dirPath, del = false) {
  * @param { Number } limitPercentage
  */
 async function reduceDirectory(directory, mountPath, limitPercentage) {
-  let diskPercent = await getDiskPercentage((mountPath = config.diskMountPath));
+  let diskPercent = await getDiskPercentage(config.diskMountPath);
   if (diskPercent < config.diskLimit) {
     console.log(
       `More than ${100 - config.diskLimit}% of disk space left. Exiting.\n`
     );
     return;
   }
-  let dirSize = await processFiles(directory, (del = false));
+  let dirSize = await processFiles(directory, false);
   console.log(`Size of ${directory} is ${dirSize / 1e9} GB`);
   let reduced = false;
   while (diskPercent > limitPercentage && Number(dirSize) > 1e9) {
-    dirSize = await processFiles(directory, (del = true));
-    diskPercent = await getDiskPercentage((mountPath = mountPath));
+    dirSize = await processFiles(directory, true);
+    diskPercent = await getDiskPercentage(mountPath);
     reduced = true;
   }
   if (!reduced) {

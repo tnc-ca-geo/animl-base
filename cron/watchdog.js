@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * Connect to the IoT watchdog
  * Will fail if WATCHDOG_X_KEY is not provided in .env
