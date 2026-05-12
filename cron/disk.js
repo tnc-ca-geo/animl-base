@@ -45,7 +45,9 @@ async function getDiskPercentage(mountPath = '/') {
   const freeGB = await getFreeGB(mountPath);
   const percentage = Number(((totalGB - freeGB) / totalGB) * 100);
   console.log(
-    `Disk: ${percentage.toFixed(1)}% of ${totalGB}GB full; ${freeGB}GB available`
+    `Disk: ${percentage.toFixed(
+      1
+    )}% of ${totalGB}GB full; ${freeGB}GB available`
   );
   return percentage;
 }
@@ -129,7 +131,7 @@ async function reduceDirectory(directory, mountPath, limitPercentage) {
     reduced = true;
   }
   if (!reduced) {
-    console.log(`Size of ${config.archiveDir} cannot be further reduced.`);
+    console.log(`Size of ${directory} cannot be further reduced.`);
   } else {
     console.log(
       `Size of ${directory} is ` +
