@@ -11,14 +11,12 @@ module.exports = {
   archiveDir: process.env.ARCHIVE_DIR,
   diskLimit: Number(process.env.DISK_LIMIT_PERCENT) || 60,
   diskMountPath: process.env.DISK_MOUNT_PATH || '/',
-  // env variables are always strings and they must be elevated as such
+  // env variables are always strings and they must be evaluated as such
   deleteQueueForDisk: process.env.DELETE_QUEUE_FOR_DISK == 'true',
-  // for testing and foo image generation
   watchDir: process.env.WATCH_DIR,
   watchdogEnabled: process.env.WATCHDOG_ENABLED == 'true',
-  watchdogApiEndPoint: 'api-dev.iotwatchdog.org',
-  // for production
-  // watchdogApiEndPoint: 'api.iotwatchdog.org',
+  // watchdogApiEndPoint: 'api-dev.iotwatchdog.org', // dev endpoint
+  watchdogApiEndPoint: 'api.iotwatchdog.org', // prod endpoint
   watchdogXApiKey: process.env.WATCHDOG_X_API_KEY,
   watchdogSubscriptions: process.env.WATCHDOG_SUBSCRIPTIONS,
   watchdogLabel: process.env.WATCHDOG_LABEL,
