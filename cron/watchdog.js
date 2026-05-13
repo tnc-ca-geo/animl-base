@@ -46,7 +46,7 @@ async function start() {
   const options = {
     host: config.watchdogApiEndPoint,
     port: 443,
-    path: '/hook/62',
+    path: '/hook/1500', // if the device does not report every 1500 minutes (25 hours) it will be marked as offline
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
