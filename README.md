@@ -400,65 +400,61 @@ the steps above starting with `npm run start-daemon`.
 ### CRON jobs
 
 The installation will also implement two CRON jobs to manage resources on the
-computer. The first one (```disk-management```) deletes a random subset of
+computer. The first one (`disk-management`) deletes a random subset of
 archived images on the computer if the disk is in danger of running out of
-space (runs every hour). The second one (```watchdog```) issues a POST request
+space (runs every hour). The second one (`watchdog`) issues a POST request
 to a watchdog API that will send emails if the field computer is down (runs
 daily). The frequency on which the scripts run can be changed in
-```ecosystem.config.js```. Both jobs can be turn off by commenting out the job
-definition in ```ecosystem.config.js```. To persist changed to
-```ecosystem.config.js``` run:
+`ecosystem.config.js`. Both jobs can be turn off by commenting out the job
+definition in `ecosystem.config.js`. To persist changed to
+`ecosystem.config.js` run:
 
-```
+```shell
 $ pm2 stop all
-$ pm2 delete  # important to reset CRON jobs
-$ pm2 start --update-env
-$ pm2 save    # import to persist changes despite system restarts
+$ pm2 unstartup systemd
+$ pm2 delete all # important to reset CRON jobs
+$ npm run start-daemon # must be run from animl-base root
+$ pm2 startup systemd # copy and run generated command this produces
+$ pm2 save # import to persist changes despite system restarts
 ```
 
-The use of ```pm2 delete``` is a little bit brute force here and there are some
-more subtle ways such as the ```--cron-restart="0 1 * * *"``` flag. However
-that approach would not read the cron schedule from ```ecosystem.config.js```
-but set an arbitrary value that could be out of sync.
-
-In the overview displayed by ```pm2 list``` the CRON jobs will appear as
+In the overview displayed by `pm2 list` the CRON jobs will appear as
 stopped unless they are currently running.
 
-The CRON jobs can be configured with following parameters in ```.env```:
+The CRON jobs can be configured with following parameters in `.env`:
 
 **disk-management**:
 
-- ```DISK_LIMIT_PERCENT``` (default 60): The percentage of the overall disk use
-before an archive or a queue purge will be triggered despite the actual size of
-archive and queue. The archive would be emptied entirely before the queue will
-be purged (if enabled). This is for extreme situations only, e.g., if the field
-computer is offline for a very long time. like months.
+- `DISK_LIMIT_PERCENT` (default 60): The percentage of the overall disk use
+  before an archive or a queue purge will be triggered despite the actual size of
+  archive and queue. The archive would be emptied entirely before the queue will
+  be purged (if enabled). This is for extreme situations only, e.g., if the field
+  computer is offline for a very long time. like months.
 
-- ```DISK_MOUNT_PATH``` (default '/'): If more than one disk is mounted to the
-system this needs to point to the directory where the disk used by animl is
-mounted.
+- `DISK_MOUNT_PATH` (default '/'): If more than one disk is mounted to the
+  system this needs to point to the directory where the disk used by animl is
+  mounted.
 
-- ```DELETE_QUEUE_FOR_DISK```: (default false): If true it will also purge the
-queue for recovering disk space but only as a very last resort depending which
-situation is more important; either that the computer stays online or that all
-files will be maintaned until forwarded to the cloud. Again, this is a dire
-emergency situation that should not occur in normal operation.
+- `DELETE_QUEUE_FOR_DISK`: (default false): If true it will also purge the
+  queue for recovering disk space but only as a very last resort depending which
+  situation is more important; either that the computer stays online or that all
+  files will be maintaned until forwarded to the cloud. Again, this is a dire
+  emergency situation that should not occur in normal operation.
 
 **watchdog**
 
-- ```WATCHDOG_ENABLE``` (default true): Enable the watchdog.
+- `WATCHDOG_ENABLE` (default true): Enable the watchdog.
 
-- ```WATCHDOG_X_API_KEY```: The API key for the watchdog API.
+- `WATCHDOG_X_API_KEY`: The API key for the watchdog API.
 
-- ```WATCHDOG_LABEL```: A custom label to use for referencing to the computer in
-watchdog emails.
+- `WATCHDOG_LABEL`: A custom label to use for referencing to the computer in
+  watchdog emails.
 
-- ```WATCHDOG_SUBSCRIPTIONS```: A string of comma-separated email addresses to
-which watchdog messages will be sent.
+- `WATCHDOG_SUBSCRIPTIONS`: A string of comma-separated email addresses to
+  which watchdog messages will be sent.
 
-For all available ```.env``` parameters see ```template.env```. For simplicity
-the ```template.env``` can be copied to ```.env``` and then edited.
-
+For all available `.env` parameters see `template.env`. For simplicity
+the `template.env` can be copied to `.env` and then edited.
 
 ## Managment
 
