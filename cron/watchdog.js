@@ -35,6 +35,13 @@ async function start() {
     return;
   }
 
+  if (config.watchdogSubscriptions.includes(' ')) {
+    console.log(
+      'Error: WATCHDOG_SUBSCRIPTIONS should not contain spaces. Exiting.'
+    );
+    return;
+  }
+
   const subscriptions = config.watchdogSubscriptions.split(',');
 
   const data = JSON.stringify({
