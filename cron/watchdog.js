@@ -67,11 +67,11 @@ async function start() {
       data += chunk;
     });
     res.on('end', () => {
-      console.log('Response:', data);
+      console.log(`Check-in at ${new Date().toISOString()}: `, data);
     });
   });
   req.on('error', (err) => {
-    console.log('Error: ', err.message);
+    console.log(`Error at ${new Date().toISOString()}: `, err.message);
   });
   req.write(data);
   req.end();
