@@ -21,12 +21,13 @@ module.exports = {
       watch: false,
       autorestart: false,
     },
+    // switch the watchdog to hourly to make sure we bridge nightly blackouts
     {
       name: 'watchdog',
       script: './cron/watchdog.js',
       instances: 1,
       exec_mode: 'fork',
-      cron_restart: '0 1 * * *',
+      cron_restart: '0 * * * *',
       watch: false,
       autorestart: false,
     },
